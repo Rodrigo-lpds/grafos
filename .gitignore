@@ -1,0 +1,56 @@
+# Grafos
+
+/grafos/
+# Arquivos objeto
+*.o
+
+# Executáveis principais
+conversor
+bfs_demo
+dfs_demo
+busca_demo
+distancias_demo
+diametro_demo
+componentes_demo
+estatisticas_demo
+teste_desempenho
+test_lista
+
+# Arquivos de saída gerados pelos programas
+*_lista_*.txt
+*_matriz_*.txt
+bfs_lista_*.txt
+bfs_matriz_*.txt
+dfs_lista_*.txt
+dfs_matriz_*.txt
+resultado_*.txt
+output_*.txt
+
+# Arquivos temporários
+*.tmp
+*.temp
+*~
+.*.swp
+.*.swo
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de debug
+*.gdb
+core
+vgcore.*
+
+# Diretórios de build (caso sejam criados no futuro)
+build/
+bin/
+obj/
+
+# Arquivos de profiling
+gmon.out
+*.prof
+
+# Backups
+*.bak
+*.backup
