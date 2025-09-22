@@ -49,17 +49,27 @@ void Estatisticas::calcularEstatisticasGrau(const vector<int>& graus) {
 
 
 
-double Estatisticas::calcularMediana(vector<int> valores) {
-    if (valores.empty()) return 0.0;
+double Estatisticas::calcularMediana(const vector<int>& graus) {
+    if (graus.empty()) return 0.0;
     
-    sort(valores.begin(), valores.end());
+    // Cria cópia apenas uma vez, não a cada chamada
+    vector<int> valores = graus;
     size_t tamanho = valores.size();
     
     if (tamanho % 2 == 0) {
-        // Par: média dos dois valores centrais
-        return (valores[tamanho/2 - 1] + valores[tamanho/2]) / 2.0;
+        // Par: precisa dos dois valores centrais
+        // Usa nth_element para encontrar o elemento na posição tamanho/2 - 1
+        nth_element(valores.begin(), valores.begin() + tamanho/2 - 1, valores.end());
+        int primeiro = valores[tamanho/2 - 1];
+        
+        // Usa nth_element novamente para encontrar o próximo elemento
+        nth_element(valores.begin(), valores.begin() + tamanho/2, valores.end());
+        int segundo = valores[tamanho/2];
+        
+        return (primeiro + segundo) / 2.0;
     } else {
-        // Ímpar: valor central
+        // Ímpar: usa nth_element para encontrar o elemento central
+        nth_element(valores.begin(), valores.begin() + tamanho/2, valores.end());
         return valores[tamanho/2];
     }
 }

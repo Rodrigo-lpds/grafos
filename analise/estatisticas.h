@@ -37,7 +37,7 @@ private:
     
     vector<int> calcularGraus_Lista(const ListaAdjacencia& lista);
     void calcularEstatisticasGrau(const vector<int>& graus);
-    double calcularMediana(vector<int> valores);
+    double calcularMediana(const vector<int>& graus);
     void calcularDiametro_Lista(const ListaAdjacencia& lista);
     void analisarBuscas_Lista(const ListaAdjacencia& lista);
     void calcularDistanciasEspecificas_Lista(const ListaAdjacencia& lista);

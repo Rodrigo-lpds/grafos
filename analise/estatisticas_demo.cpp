@@ -1,9 +1,12 @@
 #include <iostream>
+#include <string>
+#include <filesystem>
 #include "../representacao_leitura/leitor_grafo.h"
 #include "../representacao_leitura/lista_adjacencia.h"
 #include "estatisticas.h"
 #include "componentes.h"
 using namespace std;
+namespace fs = std::filesystem;
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -15,6 +18,12 @@ int main(int argc, char** argv) {
     try {
         // Lê o grafo
         DadosGrafo dados = LeitorGrafo::lerArquivo(argv[1]);
+        
+        // Gera nome do arquivo de relatório baseado no arquivo de entrada
+        string arquivoEntrada = argv[1];
+        fs::path pathEntrada(arquivoEntrada);
+        string nomeBase = pathEntrada.stem().string(); // Nome sem extensão
+        string nomeRelatorio = "relatorio_" + nomeBase + ".txt";
         
         cout << "RELATÓRIO DE ESTATÍSTICAS - " << argv[1] << "\n";
         cout << "=========================================\n\n";
@@ -34,9 +43,9 @@ int main(int argc, char** argv) {
             // Executa análises adicionais
             stats.executarAnaliseCompleta_Lista(lista);
             
-            stats.salvarRelatorio("relatorio_completo.txt");
+            stats.salvarRelatorio(nomeRelatorio);
             
-            cout << "💾 Relatório detalhado salvo em: relatorio_completo.txt\n";
+            cout << "💾 Relatório detalhado salvo em: " << nomeRelatorio << "\n";
         }
         
     } catch (exception& e) {
