@@ -112,8 +112,21 @@ void Distancias::calcularDistancias_Matriz(const MatrizAdjacencia& matriz) {
 }
 
 void Distancias::calcularDistancias_Lista(const ListaAdjacencia& lista) {
+    // Para grafos grandes (>500 vértices), usa algoritmo otimizado por padrão
+    if (n > 500) {
+        cout << "🔄 Grafo grande detectado (" << n << " vértices) - usando algoritmo otimizado\n";
+        cout << "💡 Para matriz completa de distâncias, use um grafo menor ou implemente versão otimizada específica\n";
+        
+        // Calcula apenas o diâmetro sem matriz completa
+        calcularDiametroAproximado_Lista(lista);
+        return;
+    }
+    
+    // Para grafos menores, usa algoritmo completo original
     diametro = 0;
     vertices_diametro = {-1, -1};
+    
+    cout << "🔄 Calculando matriz completa de distâncias (" << n << " vértices)...\n";
     
     // Calcula distâncias de cada vértice para todos os outros usando BFS
     for (int i = 0; i < n; i++) {
@@ -129,6 +142,8 @@ void Distancias::calcularDistancias_Lista(const ListaAdjacencia& lista) {
             }
         }
     }
+    
+    cout << "✅ Matriz de distâncias completa calculada\n";
 }
 
 int Distancias::getDistancia(int origem, int destino) const {
@@ -270,4 +285,121 @@ bool Distancias::isConexo() const {
 
 const vector<vector<int>>& Distancias::getMatrizDistancias() const {
     return distancias;
+}
+
+// IMPLEMENTAÇÕES OTIMIZADAS PARA CÁLCULO DO DIÂMETRO
+
+vector<int> Distancias::selecionarVerticesAmostra(int numAmostras) const {
+    vector<int> vertices;
+    
+    // Se o grafo é pequeno, usa todos os vértices
+    if (n <= numAmostras) {
+        for (int i = 0; i < n; i++) {
+            vertices.push_back(i);
+        }
+        return vertices;
+    }
+    
+    // Para grafos maiores, seleciona amostra distribuída
+    int intervalo = n / numAmostras;
+    for (int i = 0; i < numAmostras; i++) {
+        vertices.push_back((i * intervalo) % n);
+    }
+    
+    // Adiciona alguns vértices aleatórios extras
+    if (numAmostras < n / 2) {
+        vertices.push_back(0);           // Primeiro vértice
+        vertices.push_back(n - 1);       // Último vértice
+        vertices.push_back(n / 2);       // Vértice do meio
+    }
+    
+    return vertices;
+}
+
+bool Distancias::verificarConectividade_Lista(const ListaAdjacencia& lista) {
+    // Executa BFS do vértice 0 para verificar se alcança todos
+    BFS bfs(n);
+    bfs.executarBFS_Lista(lista, 1); // Vértice 1 (1-based)
+    
+    // Verifica se todos os vértices foram visitados
+    for (int i = 1; i <= n; i++) {
+        if (!bfs.foiVisitado(i)) {
+            return false; // Grafo não é conexo
+        }
+    }
+    return true; // Grafo é conexo
+}
+
+void Distancias::calcularDiametroAproximado_Lista(const ListaAdjacencia& lista) {
+    diametro = 0;
+    vertices_diametro = {-1, -1};
+    
+    // Primeiro verifica se o grafo é conexo (parada antecipada)
+    bool grafoConexo = verificarConectividade_Lista(lista);
+    
+    // Define número de amostras baseado no tamanho do grafo
+    int numAmostras;
+    if (n <= 100) {
+        numAmostras = n; // Grafo pequeno: usa todos os vértices
+    } else if (n <= 1000) {
+        numAmostras = min(50, n / 4); // Grafo médio: ~25% dos vértices
+    } else {
+        numAmostras = min(100, n / 10); // Grafo grande: ~10% dos vértices
+    }
+    
+    vector<int> vertices_amostra = selecionarVerticesAmostra(numAmostras);
+    
+    cout << "🚀 Calculando diâmetro aproximado usando " << vertices_amostra.size() 
+         << " vértices de " << n << " (" << (100.0 * vertices_amostra.size() / n) 
+         << "% amostra)\n";
+    
+    // Para grafos não conexos, usa estratégia diferente
+    if (!grafoConexo) {
+        cout << "⚠️  Grafo não é conexo - calculando maior distância finita\n";
+        
+        // Para grafos não conexos, testa mais vértices para encontrar 
+        // a maior distância finita entre componentes
+        for (int origem : vertices_amostra) {
+            vector<int> dist_de_origem = bfs_distancias_lista(lista, origem);
+            
+            for (int j = 0; j < n; j++) {
+                if (dist_de_origem[j] != INFINITO && dist_de_origem[j] > diametro) {
+                    diametro = dist_de_origem[j];
+                    vertices_diametro = {origem + 1, j + 1}; // Converte para 1-based
+                }
+            }
+        }
+    } else {
+        // Para grafos conexos, usa amostragem mais agressiva
+        for (int origem : vertices_amostra) {
+            vector<int> dist_de_origem = bfs_distancias_lista(lista, origem);
+            
+            // Para grafos conexos, pode amostrar também os destinos
+            vector<int> destinos_amostra = selecionarVerticesAmostra(numAmostras);
+            
+            for (int destino : destinos_amostra) {
+                if (origem != destino && dist_de_origem[destino] != INFINITO && 
+                    dist_de_origem[destino] > diametro) {
+                    diametro = dist_de_origem[destino];
+                    vertices_diametro = {origem + 1, destino + 1}; // Converte para 1-based
+                }
+            }
+            
+            // Para o vértice com maior distância, testa todos os destinos
+            auto maxDist = max_element(dist_de_origem.begin(), dist_de_origem.end());
+            if (maxDist != dist_de_origem.end() && *maxDist != INFINITO && *maxDist > diametro) {
+                int maxIndex = maxDist - dist_de_origem.begin();
+                diametro = *maxDist;
+                vertices_diametro = {origem + 1, maxIndex + 1}; // Converte para 1-based
+            }
+        }
+    }
+    
+    cout << "✅ Diâmetro aproximado calculado: " << diametro 
+         << " (vértices " << vertices_diametro.first << " e " << vertices_diametro.second << ")\n";
+}
+
+void Distancias::calcularDiametroApenas_Lista(const ListaAdjacencia& lista) {
+    // Não aloca a matriz completa de distâncias - apenas calcula o diâmetro
+    calcularDiametroAproximado_Lista(lista);
 }

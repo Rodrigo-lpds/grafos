@@ -190,7 +190,15 @@ void Estatisticas::salvarRelatorio(const string& nomeArquivo) const {
 
 void Estatisticas::calcularDiametro_Lista(const ListaAdjacencia& lista) {
     Distancias dist(n);
-    dist.calcularDistancias_Lista(lista);
+    
+    // Para melhor performance, usa versão otimizada que calcula apenas o diâmetro
+    if (n > 100) {
+        cout << "🚀 Usando algoritmo otimizado para cálculo do diâmetro\n";
+        dist.calcularDiametroApenas_Lista(lista);
+    } else {
+        // Para grafos pequenos, usa versão completa
+        dist.calcularDistancias_Lista(lista);
+    }
     
     stats.diametro = dist.getDiametro();
     stats.verticesDiametro = dist.getVerticesDiametro();

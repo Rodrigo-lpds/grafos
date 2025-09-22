@@ -20,6 +20,11 @@ private:
     vector<int> bfs_distancias_matriz(const MatrizAdjacencia& matriz, int origem);
     vector<int> bfs_distancias_lista(const ListaAdjacencia& lista, int origem);
     
+    // Funções otimizadas para cálculo do diâmetro
+    void calcularDiametroAproximado_Lista(const ListaAdjacencia& lista);
+    bool verificarConectividade_Lista(const ListaAdjacencia& lista);
+    vector<int> selecionarVerticesAmostra(int numAmostras) const;
+    
 public:
     static constexpr int INFINITO = 999999; // Valor grande para representar infinito
     
@@ -31,6 +36,9 @@ public:
     
     // Calcula todas as distâncias usando lista de adjacência
     void calcularDistancias_Lista(const ListaAdjacencia& lista);
+    
+    // Versão otimizada para calcular apenas o diâmetro (sem matriz completa)
+    void calcularDiametroApenas_Lista(const ListaAdjacencia& lista);
     
     // Métodos eficientes para consultas específicas (apenas uma BFS)
     int calcularDistanciaEspecifica_Matriz(const MatrizAdjacencia& matriz, int origem, int destino);
