@@ -12,7 +12,6 @@ using namespace std;
 class Distancias {
 private:
     int n; // número de vértices
-    vector<vector<int>> distancias; // matriz de distâncias entre todos os pares
     int diametro; // diâmetro do grafo
     pair<int, int> vertices_diametro; // par de vértices que formam o diâmetro
     
@@ -22,7 +21,7 @@ private:
     
     // Funções otimizadas para cálculo do diâmetro
     void calcularDiametroAproximado_Lista(const ListaAdjacencia& lista);
-    bool verificarConectividade_Lista(const ListaAdjacencia& lista);
+    bool verificarConectividade_Lista(const ListaAdjacencia& lista) const;
     vector<int> selecionarVerticesAmostra(int numAmostras) const;
     
 public:
@@ -41,11 +40,12 @@ public:
     void calcularDiametroApenas_Lista(const ListaAdjacencia& lista);
     
     // Métodos eficientes para consultas específicas (apenas uma BFS)
-    int calcularDistanciaEspecifica_Matriz(const MatrizAdjacencia& matriz, int origem, int destino);
-    int calcularDistanciaEspecifica_Lista(const ListaAdjacencia& lista, int origem, int destino);
+    int calcularDistanciaEspecifica_Matriz(const MatrizAdjacencia& matriz, int origem, int destino) const;
+    int calcularDistanciaEspecifica_Lista(const ListaAdjacencia& lista, int origem, int destino) const;
     
-    // Retorna a distância entre dois vértices
-    int getDistancia(int origem, int destino) const;
+    // Retorna a distância entre dois vértices (calcula sob demanda)
+    int getDistancia_Lista(const ListaAdjacencia& lista, int origem, int destino) const;
+    int getDistancia_Matriz(const MatrizAdjacencia& matriz, int origem, int destino) const;
     
     // Retorna o diâmetro do grafo
     int getDiametro() const;
@@ -62,11 +62,9 @@ public:
     // Salva resultados em arquivo
     void salvarResultado(const string& nomeArquivo) const;
     
-    // Verifica se o grafo é conexo
-    bool isConexo() const;
-    
-    // Retorna matriz de distâncias completa
-    const vector<vector<int>>& getMatrizDistancias() const;
+    // Verifica se o grafo é conexo (usando BFS de um vértice)
+    bool isConexo_Lista(const ListaAdjacencia& lista) const;
+    bool isConexo_Matriz(const MatrizAdjacencia& matriz) const;
 };
 
 #endif
