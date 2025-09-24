@@ -22,41 +22,30 @@ void DFS::executarDFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial)
     // Converte para índice 0-based
     int s = verticeInicial - 1;
     
-    // 1. DFS(s)
-    // 2. Desmarcar todos os vértices (já feito no reset())
-    
-    // 3. Definir pilha P com um elemento s
-    stack<pair<int, int>> P; // Par (vértice, pai) para rastrear árvore
+    stack<pair<int, int>> P;
     P.push({s, -1});
     
-    // 4. Enquanto P não estiver vazia
     while (!P.empty()) {
-        // 5. Remover u de P // no topo da pilha
         auto [u, pai_u] = P.top();
         P.pop();
         
-        // 6. Se u não estiver marcado
         if (!marcado[u]) {
-            // 7. Marcar u
             marcado[u] = true;
             pai[u] = pai_u;
             
-            // Define nível baseado no pai
             if (pai_u == -1) {
-                nivel[u] = 0; // Raiz tem nível 0
+                nivel[u] = 0;
             } else {
                 nivel[u] = nivel[pai_u] + 1;
             }
             
-            ordem_visitacao.push_back(u + 1); // Salva como 1-based
+            ordem_visitacao.push_back(u + 1);
+
+            const auto& M = matriz.getMatriz();
+            const auto& linha_u = M[u];
             
-            // 8. Para cada aresta (u,v) incidente a u
-            // Percorremos em ordem reversa para manter a ordem lexicográfica
-            // quando vários vizinhos são adicionados à pilha
             for (int v = n - 1; v >= 0; v--) {
-                // Verifica se existe aresta u->v na matriz (matriz[u][v] == 1)
-                if (matriz.getMatriz()[u][v] == 1 && !marcado[v]) {
-                    // 9. Adicionar v em P // no topo
+                if (linha_u[v] == 1 && !marcado[v]) {
                     P.push({v, u});
                 }
             }
@@ -104,7 +93,7 @@ void DFS::executarDFS_Lista(const ListaAdjacencia& lista, int verticeInicial) {
             ordem_visitacao.push_back(u + 1); // Salva como 1-based
             
             // 8. Para cada aresta (u,v) incidente a u
-            const list<int>& vizinhos = lista.getLista()[u];
+            const vector<int>& vizinhos = lista.getLista()[u];
             
             // Percorremos em ordem reversa para manter a ordem lexicográfica
             // quando vários vizinhos são adicionados à pilha

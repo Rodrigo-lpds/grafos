@@ -28,15 +28,20 @@ int main(int argc, char** argv) {
 
         // Cria objeto de distâncias
         Distancias dist(dados.numVertices);
+        
+        // Cria estruturas que serão usadas para verificação de conectividade
+        MatrizAdjacencia matriz(dados);
+        ListaAdjacencia lista(dados);
+        bool conexo = false;
 
         if (tipo == "matriz" || tipo == "ambos") {
             cout << "===== CÁLCULO DE DIÂMETRO - MATRIZ =====\n";
             
-            // Cria matriz de adjacência
-            MatrizAdjacencia matriz(dados);
-            
             // Calcula distâncias
             dist.calcularDistancias_Matriz(matriz);
+            
+            // Verifica conectividade
+            conexo = dist.isConexo_Matriz(matriz);
             
             // Exibe resultados
             dist.imprimirDiametro();
@@ -49,11 +54,11 @@ int main(int argc, char** argv) {
         if (tipo == "lista" || tipo == "ambos") {
             cout << "===== CÁLCULO DE DIÂMETRO - LISTA =====\n";
             
-            // Cria lista de adjacência
-            ListaAdjacencia lista(dados);
-            
             // Calcula distâncias
             dist.calcularDistancias_Lista(lista);
+            
+            // Verifica conectividade
+            conexo = dist.isConexo_Lista(lista);
             
             // Exibe resultados
             dist.imprimirDiametro();
@@ -70,7 +75,7 @@ int main(int argc, char** argv) {
 
         // Resumo final
         cout << "========== RESUMO ==========\n";
-        if (dist.isConexo()) {
+        if (conexo) {
             cout << "📊 Grafo CONEXO\n";
             cout << "📏 Diâmetro: " << dist.getDiametro() << " arestas\n";
             auto vertices_diam = dist.getVerticesDiametro();

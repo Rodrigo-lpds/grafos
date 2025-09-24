@@ -47,10 +47,14 @@ void BFS::executarBFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial,
         int v = Q.front();
         Q.pop();
         
+        // Otimização: guarda referência da matriz fora do laço
+        const auto& M = matriz.getMatriz();
+        const auto& linha_v = M[v];
+        
         // Para todo vizinho w de v faça
         for (int w = 0; w < n; w++) {
             // Verifica se existe aresta v->w na matriz (matriz[v][w] == 1)
-            if (matriz.getMatriz()[v][w] == 1) {
+            if (linha_v[w] == 1) {
                 // Se w não estiver marcado
                 if (!marcado[w]) {
                     // marcar w
@@ -60,8 +64,6 @@ void BFS::executarBFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial,
                     // inserir w em Q
                     Q.push(w);
                     ordem_visitacao.push_back(w + 1); // Salva como 1-based
-                    
-                    // Se encontrou o destino, pode parar (apenas se destino foi especificado)
                     if (d != -1 && w == d) {
                         return;
                     }
@@ -109,7 +111,7 @@ void BFS::executarBFS_Lista(const ListaAdjacencia& lista, int verticeInicial, in
         Q.pop();
         
         // Para todo vizinho w de v faça
-        const list<int>& vizinhos = lista.getLista()[v];
+        const vector<int>& vizinhos = lista.getLista()[v];
         for (int w_1based : vizinhos) {
             int w = w_1based - 1; // Converte para 0-based
             
