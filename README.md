@@ -1,62 +1,63 @@
-# 📊 Biblioteca de Algoritmos em Grafos
+# 📊 Sistema de Análise de Grafos
 
-Uma implementação completa em C++ para análise e manipulação de grafos, oferecendo diferentes representações (matriz e lista de adjacência) e algoritmos clássicos de busca e análise.
+Uma implementação completa em C++ para análise e manipulação de grafos, oferecendo diferentes representações (matriz e lista de adjacência) e algoritmos clássicos de busca e análise através de uma **interface interativa amigável**.
 
 ## 🎯 Funcionalidades
+
+### 🖥️ Interface Interativa
+- **Menu Intuitivo**: Sistema de navegação por console com emojis e formatação clara
+- **Seleção Dinâmica**: Escolha automática de grafos disponíveis na pasta `grafos/`
+- **Configuração Flexível**: Configure estruturas de dados e algoritmos conforme necessário
+- **Resultados Detalhados**: Visualização clara de caminhos, distâncias e estatísticas
 
 ### 📋 Representações de Grafos
 - **Matriz de Adjacência**: Representação eficiente para grafos densos
 - **Lista de Adjacência**: Representação otimizada para grafos esparsos
-- **Conversor**: Transforma arquivos de texto em ambas as representações
+- **Grafos com Peso**: Suporte completo para grafos ponderados
 
-### 🔍 Algoritmos de Busca
-- **BFS (Busca em Largura)**: Encontra o menor caminho em grafos não-ponderados
-- **DFS (Busca em Profundidade)**: Explora grafos de forma recursiva
-- **Comparação de Desempenho**: Análise comparativa entre matriz e lista
+### 🔍 Algoritmos Implementados
+- **BFS (Busca em Largura)**: Encontra caminhos mais curtos em grafos não ponderados
+- **DFS (Busca em Profundidade)**: Exploração completa do grafo
+- **Dijkstra**: Algoritmo para caminhos mínimos em grafos com peso
+  - Implementação com **Vetor** (simples e didática)
+  - Implementação com **Heap** (otimizada para grafos grandes)
 
-### 📈 Análises Avançadas
-- **Distâncias**: Cálculo de distâncias entre vértices
-- **Diâmetro**: Encontra a maior distância entre qualquer par de vértices
-- **Componentes Conexas**: Identifica grupos de vértices conectados
-- **Estatísticas Completas**: Relatórios detalhados sobre propriedades do grafo
+### 📈 Análises Disponíveis
+- **Estatísticas Gerais**: Número de vértices, arestas, graus (mínimo, máximo, médio)
+- **Componentes Conexas**: Identifica e analisa grupos de vértices conectados
+- **Conectividade**: Verifica se o grafo é conexo
+- **Distâncias**: Cálculo de distâncias entre vértices específicos
+- **Diâmetro**: Encontra a maior distância no grafo
 
-### ⚡ Ferramentas de Performance
-- **Teste de Desempenho**: Comparação de tempo e memória entre representações
-- **Análise Consolidada**: Relatórios comparativos para múltiplos grafos
-
-## 🛠️ Compilação
+## 🛠️ Compilação e Execução
 
 ### Pré-requisitos
 - **Compilador**: g++ com suporte a C++17
 - **Sistema**: Linux/Unix (testado em distribuições baseadas em Debian)
 
-### Compilar todos os programas
+### Compilação
 ```bash
+# Compilar o sistema completo
 make all
+
+# Compilar apenas o menu interativo
+make menu_interativo
+
+# Limpeza dos arquivos compilados
+make clean
 ```
 
-### Compilar programas específicos
+### Execução
 ```bash
-# Algoritmos de busca
-make bfs_demo          # Demo do BFS
-make dfs_demo          # Demo do DFS
-make busca_demo        # Comparação BFS vs DFS
-
-# Análises de grafos
-make distancias_demo   # Análise de distâncias
-make diametro_demo     # Cálculo do diâmetro
-make componentes_demo  # Componentes conexas
-make estatisticas_demo # Estatísticas completas
-
-# Ferramentas auxiliares
-make conversor         # Conversor de representações
-make teste_desempenho  # Análise de performance
+# Executar o menu interativo principal
+./menu_interativo
 ```
 
-## 🚀 Como Usar
+## 🚀 Como Usar o Menu Interativo
 
 ### 1. Formato dos Arquivos de Entrada
-Os grafos devem estar em formato de texto simples:
+
+#### Grafos sem peso:
 ```
 <número_de_vértices>
 <vértice1> <vértice2>
@@ -64,7 +65,15 @@ Os grafos devem estar em formato de texto simples:
 ...
 ```
 
-**Exemplo** (`grafo_exemplo.txt`):
+#### Grafos com peso:
+```
+<número_de_vértices>
+<vértice1> <vértice2> <peso>
+<vértice1> <vértice3> <peso>
+...
+```
+
+**Exemplo de grafo sem peso** (`grafo_exemplo.txt`):
 ```
 5
 1 2
@@ -74,144 +83,171 @@ Os grafos devem estar em formato de texto simples:
 4 5
 ```
 
-### 2. Executando os Algoritmos
-
-#### Busca em Largura (BFS)
-```bash
-# Usando matriz de adjacência
-./bfs_demo grafos/grafo_1.txt matriz 1
-
-# Usando lista de adjacência
-./bfs_demo grafos/grafo_1.txt lista 1
-
-# Comparando ambas as representações
-./bfs_demo grafos/grafo_1.txt ambos 1
+**Exemplo de grafo com peso** (`grafo_peso_exemplo.txt`):
+```
+5
+1 2 0.5
+2 3 1.2
+3 4 2.0
+1 4 1.8
+4 5 0.7
 ```
 
-#### Busca em Profundidade (DFS)
-```bash
-# Sintaxe similar ao BFS
-./dfs_demo grafos/grafo_1.txt ambos 1
+### 2. Navegação no Menu
+
+O sistema oferece uma interface intuitiva organizada em duas seções principais:
+
+#### ⚙️ Configuração:
+1. **Selecionar grafo**: Escolha entre os grafos disponíveis na pasta `grafos/`
+2. **Definir estrutura**: Configure matriz ou lista de adjacência
+3. **Configurar Dijkstra**: Escolha entre implementação com vetor ou heap (apenas para grafos com peso)
+
+#### 🔍 Análises:
+4. **Executar algoritmos de busca**: BFS, DFS ou Dijkstra
+5. **Analisar estatísticas**: Relatório completo do grafo
+6. **Calcular distâncias**: Análise de conectividade e diâmetro (grafos sem peso)
+
+### 3. Exemplo de Fluxo de Uso
+
 ```
-
-#### Comparação Completa de Algoritmos
-```bash
-# Compara BFS e DFS usando ambas as representações
-./busca_demo grafos/grafo_1.txt ambos ambos 1
-```
-
-#### Análise de Distâncias
-```bash
-# Calcula distâncias entre todos os pares de vértices
-./distancias_demo grafos/grafo_1.txt ambos
-```
-
-#### Cálculo do Diâmetro
-```bash
-# Encontra a maior distância no grafo
-./diametro_demo grafos/grafo_1.txt ambos
-```
-
-#### Componentes Conexas
-```bash
-# Identifica componentes conexas do grafo
-./componentes_demo grafos/grafo_1.txt ambos
-
-# Com consulta de conectividade entre vértices específicos
-./componentes_demo grafos/grafo_1.txt ambos 5 8
-```
-
-#### Estatísticas Completas
-```bash
-# Gera relatório completo do grafo
-./estatisticas_demo grafos/grafo_1.txt
-```
-
-#### Análise de Performance
-```bash
-# Testa um único grafo
-./teste_desempenho grafos/grafo_1.txt
-
-# Compara múltiplos grafos
-./teste_desempenho grafos/grafo_1.txt grafos/grafo_2.txt grafos/grafo_3.txt
-```
-
-### 3. Testes Rápidos
-```bash
-# Testes individuais
-make test_bfs         # Teste rápido do BFS
-make test_dfs         # Teste rápido do DFS
-make test_distancias  # Teste de distâncias
-make test_componentes # Teste de componentes
-make test_diametro    # Teste de diâmetro
-make test_estatisticas # Teste de estatísticas
-
-# Teste completo
-make test             # Executa testes básicos
-make test_desempenho  # Executa análise de performance
+1. Selecionar grafo → grafo_peso_exemplo.txt ✅
+2. Definir estrutura → Lista de adjacência ✅
+3. Configurar Dijkstra → Implementação com Heap ✅
+4. Executar busca → Dijkstra a partir do vértice 1
+   → Resultados: distâncias mínimas para todos os vértices
+   → Opção de visualizar caminho específico
 ```
 
 ## 📁 Estrutura do Projeto
 
 ```
 grafos/
-├── representacao_leitura/     # Leitura e representação de grafos
-│   ├── leitor_grafo.*         # Leitura de arquivos
-│   ├── matriz_adjacencia.*    # Implementação de matriz
-│   ├── lista_adjacencia.*     # Implementação de lista
-│   └── conversor_grafo.*      # Conversor entre representações
-├── busca/                     # Algoritmos de busca
-│   ├── bfs.*                  # Busca em Largura
-│   ├── dfs.*                  # Busca em Profundidade
-│   └── *_demo.cpp            # Programas de demonstração
-├── analise/                   # Algoritmos de análise
-│   ├── distancias.*           # Cálculo de distâncias
-│   ├── componentes.*          # Componentes conexas
-│   ├── estatisticas.*         # Estatísticas gerais
-│   └── *_demo.cpp            # Programas de demonstração
-├── grafos/                    # Arquivos de teste
-│   └── grafo_*.txt           # Grafos de exemplo
-├── teste_desempenho.cpp       # Análise de performance
-└── Makefile                   # Sistema de compilação
+├── menu_interativo.cpp           # 🎯 Interface principal do sistema
+├── representacao_leitura/        # 📊 Leitura e representação de grafos
+│   ├── leitor_grafo.*            # Leitura de arquivos
+│   ├── matriz_adjacencia.*       # Implementação de matriz
+│   ├── lista_adjacencia.*        # Implementação de lista
+│   ├── lista_adjacencia_peso.*   # Lista para grafos com peso
+│   └── *_adapter.h              # Adaptadores para interfaces
+├── busca/                        # 🔍 Algoritmos de busca
+│   ├── bfs.*                     # Busca em Largura
+│   ├── dfs.*                     # Busca em Profundidade
+│   ├── dijkstra.*                # Algoritmo de Dijkstra
+│   └── dijkstra_*_strategy.h     # Estratégias de implementação
+├── analise/                      # 📈 Algoritmos de análise
+│   ├── distancias.*              # Cálculo de distâncias
+│   ├── componentes.*             # Componentes conexas
+│   └── estatisticas.*            # Estatísticas gerais
+├── grafos/                       # 📂 Arquivos de teste
+│   ├── grafo_*.txt              # Grafos sem peso
+│   └── grafo_peso_*.txt         # Grafos com peso
+└── Makefile                      # 🔧 Sistema de compilação
 ```
 
 ## 📊 Exemplos de Saída
 
-### BFS/DFS
+### Menu Principal
 ```
-=== BFS usando Lista de Adjacência ===
-Vértice inicial: 1
-Ordem de visita: 1 2 4 3 5
-Árvore de busca salva em: bfs_lista_grafo_1.txt
-Tempo de execução: 0.123ms
+╔═══════════════════════════════════════════════════════════════╗
+║                    SISTEMA DE ANÁLISE DE GRAFOS               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────┐
+│                    CONFIGURAÇÃO ATUAL                      │
+└─────────────────────────────────────────────────────────────┘
+🔸 Grafo: ✅ grafo_peso_exemplo.txt (Grafo com peso)
+🔸 Estrutura: ✅ lista
+🔸 Dijkstra: ✅ heap
+
+⚙️  CONFIGURAÇÃO:
+   1. Selecionar grafo
+   2. Definir estrutura de dados (matriz/lista)
+   3. Configurar Dijkstra (apenas grafos com peso)
+
+🔍 ANÁLISES:
+   4. Executar algoritmos de busca
+   5. Analisar estatísticas do grafo
+   6. Calcular distâncias (grafos sem peso)
 ```
 
-### Componentes Conexas
+### Resultados do Dijkstra
 ```
-=== Análise de Componentes Conexas ===
-Número de componentes conexas: 2
+📊 RESULTADOS DO DIJKSTRA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Origem: 1
 
-Componente 1 (5 vértices): 1 2 3 4 5
-Componente 2 (3 vértices): 6 7 8
+Distâncias mínimas:
+  Vértice   1: 0.00
+  Vértice   2: 0.50
+  Vértice   3: 1.70
+  Vértice   4: 1.80
+  Vértice   5: 2.50
 
-Conectividade entre vértices 1 e 5: SIM (mesma componente)
+📍 Caminho de 1 para 5: 1 → 2 → 3 → 5
+📏 Distância total: 2.50
 ```
 
-### Teste de Performance
+### Análise de Estatísticas
 ```
-=============================================
-  ANÁLISE COMPARATIVA DE GRAFOS
-=============================================
+📊 ESTATÍSTICAS DO GRAFO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔸 Vértices: 10000
+🔸 Arestas: 54989
+🔸 Grau mínimo: 3
+🔸 Grau máximo: 15
+🔸 Grau médio: 10.99
+🔸 Mediana do grau: 11.00
+🔸 Componentes conexas: 1
+🔸 Grafo conexo: ✅ Sim
+```
 
-| Grafo          | Vértices | Arestas | Mem.Matriz | Mem.Lista | BFS.M | BFS.L |
-|----------------|----------|---------|------------|-----------|-------|-------|
-| grafo_1.txt    | 10000    | 54989   | 381.47 MB  | 1.68 MB   | 45ms  | 12ms  |
+## 🔧 Desenvolvimento e Testes
+
+### Comandos de Desenvolvimento
+```bash
+# Testar o menu interativo
+make test_menu
+
+# Compilar teste isolado do Dijkstra
+make teste_dijkstra
+
+# Executar teste do Dijkstra
+./teste_dijkstra
 ```
+
+### Adicionando Novos Grafos
+1. Coloque arquivos `.txt` na pasta `grafos/`
+2. Para grafos sem peso: use nomes como `grafo_nome.txt`
+3. Para grafos com peso: inclua "peso" no nome, ex: `grafo_peso_nome.txt`
+4. O sistema detectará automaticamente o tipo baseado no nome do arquivo
+
+### Estrutura de Classes Principais
+
+- **MenuInterativo**: Interface principal do sistema
+- **LeitorGrafo**: Carregamento de arquivos de grafo
+- **MatrizAdjacencia/ListaAdjacencia**: Representações de grafos
+- **BFS/DFS/Dijkstra**: Algoritmos de busca
+- **Estatisticas/Componentes/Distancias**: Ferramentas de análise
+
+## 🎯 Recursos Avançados
+
+### Algoritmo de Dijkstra
+- **Estratégia com Vetor**: Simples, ideal para grafos pequenos e fins didáticos
+- **Estratégia com Heap**: Otimizada, recomendada para grafos grandes (complexidade O((V+E)logV))
+
+### Detecção Automática de Tipos
+- O sistema identifica automaticamente se um grafo tem peso baseado no nome do arquivo
+- Suporte para grafos com pesos negativos (detectados pelo algoritmo)
+
+### Interface Adaptativa
+- Menus contextuais que se adaptam ao tipo de grafo selecionado
+- Validação automática de entrada do usuário
+- Mensagens de erro claras e orientações para correção
 
 ## 🔧 Limpeza
 
 ```bash
-# Remove arquivos compilados e saídas temporárias
+# Remove arquivos compilados e temporários
 make clean
 ```
 
