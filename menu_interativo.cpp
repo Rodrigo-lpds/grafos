@@ -7,6 +7,7 @@
 #include <memory>
 #include <sstream>
 #include <limits>
+#include <fstream>
 
 // Includes para as funcionalidades do projeto
 #include "representacao_leitura/leitor_grafo.h"
@@ -72,7 +73,39 @@ private:
     }
     
     bool verificarSeGrafoPeso(const string& nomeArquivo) {
-        return nomeArquivo.find("peso") != string::npos;
+        string caminhoCompleto = "grafos/" + nomeArquivo;
+        ifstream arquivo(caminhoCompleto);
+        
+        if (!arquivo.is_open()) {
+            return false; // Se não conseguir abrir, assume sem peso
+        }
+        
+        string linha;
+        // Pula a primeira linha (número de vértices)
+        if (!getline(arquivo, linha)) {
+            arquivo.close();
+            return false;
+        }
+        
+        // Lê a segunda linha para verificar o formato
+        if (!getline(arquivo, linha)) {
+            arquivo.close();
+            return false;
+        }
+        
+        arquivo.close();
+        
+        // Conta o número de elementos na linha
+        stringstream ss(linha);
+        string elemento;
+        int contadorColunas = 0;
+        
+        while (ss >> elemento) {
+            contadorColunas++;
+        }
+        
+        // Se tem 3 colunas, é um grafo com peso
+        return contadorColunas == 3;
     }
     
     void selecionarGrafo() {
