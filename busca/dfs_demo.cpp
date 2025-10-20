@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
     string tipo = argv[2];
     int verticeInicial;
-    
+
     try {
         verticeInicial = stoi(argv[3]);
     } catch (exception& e) {
@@ -27,52 +27,42 @@ int main(int argc, char** argv) {
     }
 
     try {
-        // 1. Lê os dados do arquivo TXT
+
         DadosGrafo dados = LeitorGrafo::lerArquivo(argv[1]);
-        cout << "Grafo lido: " << dados.numVertices << " vertices, " 
+        cout << "Grafo lido: " << dados.numVertices << " vertices, "
              << dados.arestas.size() << " arestas\n";
         cout << "Vértice inicial: " << verticeInicial << "\n\n";
 
-        // Valida vértice inicial
         if (verticeInicial < 1 || verticeInicial > dados.numVertices) {
-            cerr << "Erro: Vértice inicial deve estar entre 1 e " 
+            cerr << "Erro: Vértice inicial deve estar entre 1 e "
                  << dados.numVertices << "\n";
             return 1;
         }
 
-        // Cria objeto DFS
         DFS dfs(dados.numVertices);
 
         if (tipo == "matriz" || tipo == "ambos") {
             cout << "=== DFS usando Matriz de Adjacência ===\n";
-            
-            // Cria matriz de adjacência
+
             MatrizAdjacencia matriz(dados);
-            
-            // Executa DFS
+
             dfs.executarDFS_Matriz(matriz, verticeInicial);
-            
-            // Exibe resultado
+
             dfs.imprimirResultado();
-            
-            // Salva resultado
+
             dfs.salvarResultado("dfs_matriz_resultado.txt");
             cout << "✓ Resultado da DFS (matriz) salvo em 'dfs_matriz_resultado.txt'\n\n";
         }
 
         if (tipo == "lista" || tipo == "ambos") {
             cout << "=== DFS usando Lista de Adjacência ===\n";
-            
-            // Cria lista de adjacência
+
             ListaAdjacencia lista(dados);
-            
-            // Executa DFS (reset automático)
+
             dfs.executarDFS_Lista(lista, verticeInicial);
-            
-            // Exibe resultado
+
             dfs.imprimirResultado();
-            
-            // Salva resultado
+
             dfs.salvarResultado("dfs_lista_resultado.txt");
             cout << "✓ Resultado da DFS (lista) salvo em 'dfs_lista_resultado.txt'\n\n";
         }
@@ -81,7 +71,7 @@ int main(int argc, char** argv) {
             cout << "Tipo inválido. Use: matriz, lista ou ambos\n";
             return 1;
         }
-        
+
     } catch (exception& e) {
         cerr << "Erro: " << e.what() << endl;
         return 1;

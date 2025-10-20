@@ -13,48 +13,37 @@ using namespace std;
 
 class BFS {
 private:
-    int n; // número de vértices
+    int n;
     vector<bool> marcado;
     vector<int> ordem_visitacao;
-    vector<int> pai; // pai de cada vértice na árvore de busca
-    vector<int> nivel; // nível de cada vértice na árvore (raiz = 0)
-    
+    vector<int> pai;
+    vector<int> nivel;
+
 public:
-    // Construtor
+
     BFS(int numVertices);
-    
-    // BFS usando qualquer implementação de grafo (POLIMORFISMO - SOLID)
+
     void executarBFS(const IGrafo& grafo, int verticeInicial, int destino = -1);
-    
-    // Métodos de conveniência mantidos para compatibilidade
+
     void executarBFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial, int destino = -1);
     void executarBFS_Lista(const ListaAdjacencia& lista, int verticeInicial, int destino = -1);
-    
-    // Imprime resultado da BFS
+
     void imprimirResultado() const;
-    
-    // Salva resultado em arquivo
+
     void salvarResultado(const string& nomeArquivo) const;
-    
-    // Reseta o estado para nova execução
+
     void reset();
-    
-    // Verifica se um vértice foi visitado
+
     bool foiVisitado(int vertice) const;
-    
-    // Retorna a ordem de visitação
+
     const vector<int>& getOrdemVisitacao() const;
-    
-    // Retorna o pai de cada vértice na árvore de busca
+
     const vector<int>& getPais() const;
-    
-    // Retorna o nível de cada vértice na árvore de busca
+
     const vector<int>& getNiveis() const;
-    
-    // Retorna o pai de um vértice específico
+
     int getPai(int vertice) const;
-    
-    // Retorna o nível de um vértice específico
+
     int getNivel(int vertice) const;
 };
 

@@ -13,7 +13,7 @@ ListaAdjacenciaPeso::ListaAdjacenciaPeso(const DadosGrafoPeso& dados) {
         int u = get<0>(aresta) - 1;
         int v = get<1>(aresta) - 1;
         double peso = get<2>(aresta);
-        
+
         lista[u].push_back({v + 1, peso});
         lista[v].push_back({u + 1, peso});
     }
@@ -33,12 +33,11 @@ void ListaAdjacenciaPeso::salvarEmArquivo(const string& nomeSaida) const {
         throw runtime_error("Erro ao criar arquivo de saída");
     }
 
-    // Usa lista ordenada apenas para visualização
     auto listaOrdenada = getListaOrdenada();
-    
+
     saida << "Lista de Adjacencia com Peso (" << n << " vertices):\n";
     saida << fixed << setprecision(1);
-    
+
     for (int i = 0; i < n; i++) {
         saida << "Vertice " << (i + 1) << ": ";
         if (listaOrdenada[i].empty()) {
@@ -56,12 +55,12 @@ void ListaAdjacenciaPeso::salvarEmArquivo(const string& nomeSaida) const {
 }
 
 void ListaAdjacenciaPeso::imprimir() const {
-    // Usa lista ordenada apenas para visualização
+
     auto listaOrdenada = getListaOrdenada();
-    
+
     cout << "Lista de Adjacencia com Peso (" << n << " vertices):\n";
     cout << fixed << setprecision(1);
-    
+
     for (int i = 0; i < n; i++) {
         cout << "Vertice " << (i + 1) << ": ";
         if (listaOrdenada[i].empty()) {

@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
     string tipo = argv[2];
     int verticeInicial;
-    
+
     try {
         verticeInicial = stoi(argv[3]);
     } catch (exception& e) {
@@ -27,10 +27,9 @@ int main(int argc, char** argv) {
     }
 
     try {
-        // 1. Lê os dados do arquivo TXT
+
         string nomeArquivoEntrada = argv[1];
-        
-        // Extrai o nome base do arquivo (remove caminho e extensão)
+
         string nomeBase = nomeArquivoEntrada;
         size_t ultimaBarra = nomeBase.find_last_of("/\\");
         if (ultimaBarra != string::npos) {
@@ -40,35 +39,29 @@ int main(int argc, char** argv) {
         if (ultimoPonto != string::npos) {
             nomeBase = nomeBase.substr(0, ultimoPonto);
         }
-        
+
         DadosGrafo dados = LeitorGrafo::lerArquivo(argv[1]);
-        cout << "Grafo lido: " << dados.numVertices << " vertices, " 
+        cout << "Grafo lido: " << dados.numVertices << " vertices, "
              << dados.arestas.size() << " arestas\n";
         cout << "Vértice inicial: " << verticeInicial << "\n\n";
 
-        // Valida vértice inicial
         if (verticeInicial < 1 || verticeInicial > dados.numVertices) {
-            cerr << "Erro: Vértice inicial deve estar entre 1 e " 
+            cerr << "Erro: Vértice inicial deve estar entre 1 e "
                  << dados.numVertices << "\n";
             return 1;
         }
 
-        // Cria objeto BFS
         BFS bfs(dados.numVertices);
 
         if (tipo == "matriz" || tipo == "ambos") {
             cout << "=== BFS usando Matriz de Adjacência ===\n";
-            
-            // Cria matriz de adjacência
+
             MatrizAdjacencia matriz(dados);
-            
-            // Executa BFS
+
             bfs.executarBFS_Matriz(matriz, verticeInicial);
-            
-            // Exibe resultado
+
             bfs.imprimirResultado();
-            
-            // Salva resultado
+
             string nomeArquivoMatriz = "bfs_matriz_" + nomeBase + ".txt";
             bfs.salvarResultado(nomeArquivoMatriz);
             cout << "✓ Resultado da BFS (matriz) salvo em '" << nomeArquivoMatriz << "'\n\n";
@@ -76,17 +69,13 @@ int main(int argc, char** argv) {
 
         if (tipo == "lista" || tipo == "ambos") {
             cout << "=== BFS usando Lista de Adjacência ===\n";
-            
-            // Cria lista de adjacência
+
             ListaAdjacencia lista(dados);
-            
-            // Executa BFS (reset automático)
+
             bfs.executarBFS_Lista(lista, verticeInicial);
-            
-            // Exibe resultado
+
             bfs.imprimirResultado();
-            
-            // Salva resultado
+
             string nomeArquivoLista = "bfs_lista_" + nomeBase + ".txt";
             bfs.salvarResultado(nomeArquivoLista);
             cout << "✓ Resultado da BFS (lista) salvo em '" << nomeArquivoLista << "'\n\n";
@@ -96,7 +85,7 @@ int main(int argc, char** argv) {
             cout << "Tipo inválido. Use: matriz, lista ou ambos\n";
             return 1;
         }
-        
+
     } catch (exception& e) {
         cerr << "Erro: " << e.what() << endl;
         return 1;

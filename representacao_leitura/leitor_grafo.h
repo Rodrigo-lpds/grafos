@@ -12,7 +12,7 @@ struct DadosGrafo {
 
 struct DadosGrafoPeso {
     int numVertices;
-    vector<tuple<int, int, double>> arestas; // (u, v, peso)
+    vector<tuple<int, int, double>> arestas;
 };
 
 class LeitorGrafo {

@@ -21,9 +21,8 @@ struct EstatisticasGrafo {
     int numComponentes;
     vector<int> tamanhosComponentes;
     bool isConexo;
-    vector<int> graus; // Para cálculos
-    
-    // Informações adicionais
+    vector<int> graus;
+
     int maiorComponente;
     int menorComponente;
     int diametro;
@@ -34,7 +33,7 @@ class Estatisticas {
 private:
     int n;
     EstatisticasGrafo stats;
-    
+
     vector<int> calcularGraus_Lista(const ListaAdjacencia& lista);
     void calcularEstatisticasGrau(const vector<int>& graus);
     double calcularMediana(const vector<int>& graus);
@@ -44,17 +43,16 @@ private:
 
 public:
     Estatisticas(int numVertices);
-    
+
     void calcularEstatisticas_Lista(const ListaAdjacencia& lista, int numArestas);
-    
+
     void adicionarInformacoesComponentes(const ComponentesConexas& componentes);
-    
+
     void imprimirEstatisticas() const;
     void salvarRelatorio(const string& nomeArquivo) const;
-    
-    // Análises adicionais
+
     void executarAnaliseCompleta_Lista(const ListaAdjacencia& lista);
-    
+
     const EstatisticasGrafo& getEstatisticas() const;
 };
 

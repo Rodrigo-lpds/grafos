@@ -19,8 +19,7 @@ int main(int argc, char** argv) {
 
     string tipo = argv[2];
     int origem, destino;
-    
-    // Converte os vértices para inteiros
+
     try {
         origem = stoi(argv[3]);
         destino = stoi(argv[4]);
@@ -30,25 +29,22 @@ int main(int argc, char** argv) {
     }
 
     try {
-        // Lê os dados do arquivo TXT
+
         DadosGrafo dados = LeitorGrafo::lerArquivo(argv[1]);
-        
-        // Cria objeto de distâncias
+
         Distancias dist(dados.numVertices);
 
         int d;
         if (tipo == "matriz") {
-            // Cria matriz de adjacência
+
             MatrizAdjacencia matriz(dados);
-            
-            // Calcula apenas a distância específica (BFS otimizada)
+
             d = dist.calcularDistanciaEspecifica_Matriz(matriz, origem, destino);
         }
         else if (tipo == "lista") {
-            // Cria lista de adjacência
+
             ListaAdjacencia lista(dados);
-            
-            // Calcula apenas a distância específica (BFS otimizada)
+
             d = dist.calcularDistanciaEspecifica_Lista(lista, origem, destino);
         }
         else {
@@ -56,13 +52,12 @@ int main(int argc, char** argv) {
             return 1;
         }
 
-        // Exibe o resultado
         if (d == Distancias::INFINITO) {
             cout << "∞" << endl;
         } else {
             cout << d << endl;
         }
-        
+
     } catch (exception& e) {
         cerr << "Erro: " << e.what() << endl;
         return 1;

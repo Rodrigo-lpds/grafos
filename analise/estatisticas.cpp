@@ -23,52 +23,44 @@ Estatisticas::Estatisticas(int numVertices) : n(numVertices) {
 vector<int> Estatisticas::calcularGraus_Lista(const ListaAdjacencia& lista) {
     vector<int> graus(n, 0);
     const auto& adj = lista.getLista();
-    
+
     for (int i = 0; i < n; i++) {
         graus[i] = adj[i].size();
     }
-    
+
     return graus;
 }
 
 void Estatisticas::calcularEstatisticasGrau(const vector<int>& graus) {
     stats.graus = graus;
-    
-    // Grau mínimo e máximo
+
     auto minMax = minmax_element(graus.begin(), graus.end());
     stats.grauMinimo = *minMax.first;
     stats.grauMaximo = *minMax.second;
-    
-    // Grau médio
+
     int somaGraus = accumulate(graus.begin(), graus.end(), 0);
     stats.grauMedio = static_cast<double>(somaGraus) / n;
-    
-    // Mediana do grau
+
     stats.medianaGrau = calcularMediana(graus);
 }
 
-
-
 double Estatisticas::calcularMediana(const vector<int>& graus) {
     if (graus.empty()) return 0.0;
-    
-    // Cria cópia apenas uma vez, não a cada chamada
+
     vector<int> valores = graus;
     size_t tamanho = valores.size();
-    
+
     if (tamanho % 2 == 0) {
-        // Par: precisa dos dois valores centrais
-        // Usa nth_element para encontrar o elemento na posição tamanho/2 - 1
+
         nth_element(valores.begin(), valores.begin() + tamanho/2 - 1, valores.end());
         int primeiro = valores[tamanho/2 - 1];
-        
-        // Usa nth_element novamente para encontrar o próximo elemento
+
         nth_element(valores.begin(), valores.begin() + tamanho/2, valores.end());
         int segundo = valores[tamanho/2];
-        
+
         return (primeiro + segundo) / 2.0;
     } else {
-        // Ímpar: usa nth_element para encontrar o elemento central
+
         nth_element(valores.begin(), valores.begin() + tamanho/2, valores.end());
         return valores[tamanho/2];
     }
@@ -85,13 +77,12 @@ void Estatisticas::adicionarInformacoesComponentes(const ComponentesConexas& com
     stats.numComponentes = componentes.getNumComponentes();
     stats.isConexo = (stats.numComponentes == 1);
     stats.tamanhosComponentes.clear();
-    
+
     const auto& comps = componentes.getComponentes();
     for (const auto& comp : comps) {
         stats.tamanhosComponentes.push_back(comp.tamanho);
     }
-    
-    // Calcula maior e menor componente
+
     if (!stats.tamanhosComponentes.empty()) {
         auto minMax = minmax_element(stats.tamanhosComponentes.begin(), stats.tamanhosComponentes.end());
         stats.menorComponente = *minMax.first;
@@ -109,11 +100,11 @@ void Estatisticas::imprimirEstatisticas() const {
     cout << "• Grau médio: " << fixed << setprecision(2) << stats.grauMedio << "\n";
     cout << "• Mediana de grau: " << fixed << setprecision(1) << stats.medianaGrau << "\n";
     cout << "\n";
-    
+
     cout << "🔗 COMPONENTES CONEXAS\n";
     cout << "======================\n";
     cout << "• Número de componentes: " << stats.numComponentes << "\n";
-    
+
     if (stats.numComponentes == 1) {
         cout << "• O grafo é conexo\n";
     } else {
@@ -128,18 +119,18 @@ void Estatisticas::imprimirEstatisticas() const {
         cout << "\n";
     }
     cout << "\n";
-    
+
     cout << "🎯 DIÂMETRO\n";
     cout << "============\n";
     if (stats.isConexo) {
         cout << "• Diâmetro: " << stats.diametro << "\n";
-        cout << "• Vértices do diâmetro: " << stats.verticesDiametro.first 
+        cout << "• Vértices do diâmetro: " << stats.verticesDiametro.first
              << " e " << stats.verticesDiametro.second << "\n";
     } else {
         cout << "• Grafo não é conexo - diâmetro infinito\n";
         cout << "• Maior distância finita: " << stats.diametro << "\n";
         if (stats.verticesDiametro.first != -1) {
-            cout << "• Vértices: " << stats.verticesDiametro.first 
+            cout << "• Vértices: " << stats.verticesDiametro.first
                  << " e " << stats.verticesDiametro.second << "\n";
         }
     }
@@ -151,10 +142,10 @@ void Estatisticas::salvarRelatorio(const string& nomeArquivo) const {
     if (!arquivo) {
         throw runtime_error("Erro ao criar arquivo de estatísticas");
     }
-    
+
     arquivo << "RELATÓRIO DE ESTATÍSTICAS DO GRAFO\n";
     arquivo << "==================================\n\n";
-    
+
     arquivo << "INFORMAÇÕES BÁSICAS:\n";
     arquivo << "--------------------\n";
     arquivo << "Número de vértices: " << stats.numVertices << "\n";
@@ -164,11 +155,11 @@ void Estatisticas::salvarRelatorio(const string& nomeArquivo) const {
     arquivo << "Grau médio: " << fixed << setprecision(2) << stats.grauMedio << "\n";
     arquivo << "Mediana de grau: " << fixed << setprecision(1) << stats.medianaGrau << "\n";
     arquivo << "\n";
-    
+
     arquivo << "COMPONENTES CONEXAS:\n";
     arquivo << "--------------------\n";
     arquivo << "Número de componentes: " << stats.numComponentes << "\n";
-    
+
     if (stats.numComponentes == 1) {
         arquivo << "Status: Grafo conexo\n";
     } else {
@@ -181,18 +172,18 @@ void Estatisticas::salvarRelatorio(const string& nomeArquivo) const {
         }
     }
     arquivo << "\n";
-    
+
     arquivo << "DIÂMETRO:\n";
     arquivo << "---------\n";
     if (stats.isConexo) {
         arquivo << "Diâmetro: " << stats.diametro << "\n";
-        arquivo << "Vértices do diâmetro: " << stats.verticesDiametro.first 
+        arquivo << "Vértices do diâmetro: " << stats.verticesDiametro.first
                 << " e " << stats.verticesDiametro.second << "\n";
     } else {
         arquivo << "Diâmetro: ∞ (infinito - grafo não conexo)\n";
         arquivo << "Maior distância finita: " << stats.diametro << "\n";
         if (stats.verticesDiametro.first != -1) {
-            arquivo << "Vértices: " << stats.verticesDiametro.first 
+            arquivo << "Vértices: " << stats.verticesDiametro.first
                     << " e " << stats.verticesDiametro.second << "\n";
         }
     }
@@ -200,16 +191,15 @@ void Estatisticas::salvarRelatorio(const string& nomeArquivo) const {
 
 void Estatisticas::calcularDiametro_Lista(const ListaAdjacencia& lista) {
     Distancias dist(n);
-    
-    // Para melhor performance, usa versão otimizada que calcula apenas o diâmetro
+
     if (n > 100) {
         cout << "🚀 Usando algoritmo otimizado para cálculo do diâmetro\n";
         dist.calcularDiametroApenas_Lista(lista);
     } else {
-        // Para grafos pequenos, usa versão completa
+
         dist.calcularDistancias_Lista(lista);
     }
-    
+
     stats.diametro = dist.getDiametro();
     stats.verticesDiametro = dist.getVerticesDiametro();
 }
@@ -217,19 +207,18 @@ void Estatisticas::calcularDiametro_Lista(const ListaAdjacencia& lista) {
 void Estatisticas::analisarBuscas_Lista(const ListaAdjacencia& lista) {
     cout << "\n🔍 ANÁLISE DE BUSCAS (BFS e DFS)\n";
     cout << "=================================\n";
-    
+
     vector<int> vertices_iniciais = {1, 2, 3};
     vector<int> vertices_consulta = {10, 20, 30};
-    
+
     for (int inicio : vertices_iniciais) {
-        if (inicio > n) continue; // Verifica se o vértice existe
-        
+        if (inicio > n) continue;
+
         cout << "\n--- Iniciando busca a partir do vértice " << inicio << " ---\n";
-        
-        // BFS
+
         BFS bfs(n);
         bfs.executarBFS_Lista(lista, inicio);
-        
+
         cout << "BFS - Pais dos vértices:\n";
         for (int v : vertices_consulta) {
             if (v <= n) {
@@ -237,11 +226,10 @@ void Estatisticas::analisarBuscas_Lista(const ListaAdjacencia& lista) {
                 cout << "  Vértice " << v << ": pai = " << (pai == -1 ? "raiz/não visitado" : to_string(pai)) << "\n";
             }
         }
-        
-        // DFS
+
         DFS dfs(n);
         dfs.executarDFS_Lista(lista, inicio);
-        
+
         cout << "DFS - Pais dos vértices:\n";
         for (int v : vertices_consulta) {
             if (v <= n) {
@@ -255,15 +243,15 @@ void Estatisticas::analisarBuscas_Lista(const ListaAdjacencia& lista) {
 void Estatisticas::calcularDistanciasEspecificas_Lista(const ListaAdjacencia& lista) {
     cout << "\n📏 DISTÂNCIAS ESPECÍFICAS\n";
     cout << "=========================\n";
-    
+
     Distancias dist(n);
-    
+
     vector<pair<int, int>> pares = {{10, 20}, {10, 30}, {20, 30}};
-    
+
     for (const auto& par : pares) {
         int origem = par.first;
         int destino = par.second;
-        
+
         if (origem <= n && destino <= n) {
             int distancia = dist.calcularDistanciaEspecifica_Lista(lista, origem, destino);
             cout << "Distância entre vértices " << origem << " e " << destino << ": ";

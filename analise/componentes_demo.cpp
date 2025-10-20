@@ -22,8 +22,7 @@ int main(int argc, char** argv) {
 
     string tipo = argv[2];
     int v1 = -1, v2 = -1;
-    
-    // Verifica se foram fornecidos vértices para consulta de conectividade
+
     if (argc >= 5) {
         try {
             v1 = stoi(argv[3]);
@@ -35,76 +34,65 @@ int main(int argc, char** argv) {
     }
 
     try {
-        // 1. Lê os dados do arquivo TXT
+
         DadosGrafo dados = LeitorGrafo::lerArquivo(argv[1]);
-        cout << "Grafo lido: " << dados.numVertices << " vertices, " 
+        cout << "Grafo lido: " << dados.numVertices << " vertices, "
              << dados.arestas.size() << " arestas\n\n";
 
-        // Cria objeto de componentes conexas
         ComponentesConexas comp(dados.numVertices);
 
         if (tipo == "matriz" || tipo == "ambos") {
             cout << "===== COMPONENTES CONEXAS - MATRIZ =====\n";
-            
-            // Cria matriz de adjacência
+
             MatrizAdjacencia matriz(dados);
-            
-            // Encontra componentes
+
             comp.encontrarComponentes_Matriz(matriz);
-            
-            // Exibe resultados
+
             comp.imprimirComponentes();
             comp.imprimirEstatisticas();
-            
-            // Consulta específica se fornecida
+
             if (v1 != -1 && v2 != -1) {
                 cout << "Consulta de Conectividade:\n";
                 cout << "Vértices " << v1 << " e " << v2 << ": ";
                 if (comp.estaoConectados(v1, v2)) {
-                    cout << "✅ CONECTADOS (mesma componente " 
+                    cout << "✅ CONECTADOS (mesma componente "
                          << comp.getComponenteDoVertice(v1) << ")\n";
                 } else {
-                    cout << "❌ NÃO CONECTADOS (componentes " 
-                         << comp.getComponenteDoVertice(v1) << " e " 
+                    cout << "❌ NÃO CONECTADOS (componentes "
+                         << comp.getComponenteDoVertice(v1) << " e "
                          << comp.getComponenteDoVertice(v2) << ")\n";
                 }
                 cout << "\n";
             }
-            
-            // Salva resultado
+
             comp.salvarResultado("componentes_matriz_resultado.txt");
             cout << "✓ Resultado das componentes (matriz) salvo em 'componentes_matriz_resultado.txt'\n\n";
         }
 
         if (tipo == "lista" || tipo == "ambos") {
             cout << "===== COMPONENTES CONEXAS - LISTA =====\n";
-            
-            // Cria lista de adjacência
+
             ListaAdjacencia lista(dados);
-            
-            // Encontra componentes
+
             comp.encontrarComponentes_Lista(lista);
-            
-            // Exibe resultados
+
             comp.imprimirComponentes();
             comp.imprimirEstatisticas();
-            
-            // Consulta específica se fornecida
+
             if (v1 != -1 && v2 != -1) {
                 cout << "Consulta de Conectividade:\n";
                 cout << "Vértices " << v1 << " e " << v2 << ": ";
                 if (comp.estaoConectados(v1, v2)) {
-                    cout << "✅ CONECTADOS (mesma componente " 
+                    cout << "✅ CONECTADOS (mesma componente "
                          << comp.getComponenteDoVertice(v1) << ")\n";
                 } else {
-                    cout << "❌ NÃO CONECTADOS (componentes " 
-                         << comp.getComponenteDoVertice(v1) << " e " 
+                    cout << "❌ NÃO CONECTADOS (componentes "
+                         << comp.getComponenteDoVertice(v1) << " e "
                          << comp.getComponenteDoVertice(v2) << ")\n";
                 }
                 cout << "\n";
             }
-            
-            // Salva resultado
+
             comp.salvarResultado("componentes_lista_resultado.txt");
             cout << "✓ Resultado das componentes (lista) salvo em 'componentes_lista_resultado.txt'\n\n";
         }
@@ -114,10 +102,9 @@ int main(int argc, char** argv) {
             return 1;
         }
 
-        // Resumo final
         cout << "========== RESUMO FINAL ==========\n";
         cout << "📊 Número de componentes: " << comp.getNumComponentes() << "\n";
-        
+
         const auto& componentes = comp.getComponentes();
         if (componentes.size() == 1) {
             cout << "🔗 Grafo é CONEXO\n";
@@ -126,7 +113,7 @@ int main(int argc, char** argv) {
             cout << "📈 Maior componente: " << componentes[0].tamanho << " vértices\n";
             cout << "📉 Menor componente: " << componentes.back().tamanho << " vértices\n";
         }
-        
+
     } catch (exception& e) {
         cerr << "Erro: " << e.what() << endl;
         return 1;

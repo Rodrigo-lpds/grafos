@@ -6,64 +6,56 @@
 
 BFS::BFS(int numVertices) : n(numVertices) {
     marcado.resize(n, false);
-    pai.resize(n, -1); // -1 indica que não tem pai (ou é raiz)
-    nivel.resize(n, -1); // -1 indica que não foi visitado
+    pai.resize(n, -1);
+    nivel.resize(n, -1);
     ordem_visitacao.clear();
 }
 
 void BFS::executarBFS(const IGrafo& grafo, int verticeInicial, int destino) {
-    // Valida entrada
+
     if (verticeInicial < 1 || verticeInicial > n) {
         throw invalid_argument("Vértice inicial inválido");
     }
-    
+
     if (destino != -1 && (destino < 1 || destino > n)) {
         throw invalid_argument("Vértice destino inválido");
     }
-    
-    reset(); // Limpa estado anterior
-    
-    // Converte para índice 0-based
+
+    reset();
+
     int s = verticeInicial - 1;
     int d = (destino == -1) ? -1 : destino - 1;
-    
-    // Definir fila Q vazia
+
     queue<int> Q;
-    
-    // Marcar s e inserir s na fila Q
+
     marcado[s] = true;
-    nivel[s] = 0; // Raiz tem nível 0
-    pai[s] = -1; // Raiz não tem pai
+    nivel[s] = 0;
+    pai[s] = -1;
     Q.push(s);
-    ordem_visitacao.push_back(s + 1); // Salva como 1-based
-    
-    // Se origem é igual ao destino, já terminou
+    ordem_visitacao.push_back(s + 1);
+
     if (d != -1 && s == d) {
         return;
     }
-    
-    // Enquanto Q não estiver vazia
+
     while (!Q.empty()) {
-        // Retirar v de Q
+
         int v = Q.front();
         Q.pop();
-        
-        // Usar polimorfismo: getVizinhos funciona para qualquer tipo de grafo
+
         vector<int> vizinhos = grafo.getVizinhos(v);
-        
-        // Para todo vizinho w de v
+
         for (int w : vizinhos) {
-            // Se w não estiver marcado
+
             if (!marcado[w]) {
-                // marcar w
+
                 marcado[w] = true;
-                nivel[w] = nivel[v] + 1; // Nível do filho = nível do pai + 1
-                pai[w] = v; // Define o pai na árvore de busca
-                // inserir w em Q
+                nivel[w] = nivel[v] + 1;
+                pai[w] = v;
+
                 Q.push(w);
-                ordem_visitacao.push_back(w + 1); // Salva como 1-based
-                
-                // Parada antecipada se chegou ao destino
+                ordem_visitacao.push_back(w + 1);
+
                 if (d != -1 && w == d) {
                     return;
                 }
@@ -88,13 +80,13 @@ void BFS::imprimirResultado() const {
         cout << "Nenhum vértice foi visitado.\n";
         return;
     }
-    
+
     for (size_t i = 0; i < ordem_visitacao.size(); i++) {
         if (i > 0) cout << " -> ";
         cout << ordem_visitacao[i];
     }
     cout << "\n\n";
-    
+
     cout << "Árvore de Busca (Pai | Nível):\n";
     for (int i = 0; i < n; i++) {
         if (marcado[i]) {
@@ -115,22 +107,22 @@ void BFS::salvarResultado(const string& nomeArquivo) const {
     if (!arquivo) {
         throw runtime_error("Erro ao criar arquivo de resultado");
     }
-    
+
     arquivo << "BFS - Resultado da Busca em Largura\n";
     arquivo << "=====================================\n\n";
-    
+
     arquivo << "Ordem de visitação:\n";
     if (ordem_visitacao.empty()) {
         arquivo << "Nenhum vértice foi visitado.\n";
         return;
     }
-    
+
     for (size_t i = 0; i < ordem_visitacao.size(); i++) {
         if (i > 0) arquivo << " -> ";
         arquivo << ordem_visitacao[i];
     }
     arquivo << "\n\n";
-    
+
     arquivo << "Árvore de Busca:\n";
     arquivo << "Vértice | Pai | Nível\n";
     arquivo << "--------|-----|-------\n";
@@ -179,7 +171,7 @@ int BFS::getPai(int vertice) const {
         return -1;
     }
     int paiIndex = pai[vertice - 1];
-    return (paiIndex == -1) ? -1 : paiIndex + 1; // Retorna em 1-based ou -1
+    return (paiIndex == -1) ? -1 : paiIndex + 1;
 }
 
 int BFS::getNivel(int vertice) const {

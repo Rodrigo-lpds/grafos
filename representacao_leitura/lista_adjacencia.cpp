@@ -30,9 +30,8 @@ void ListaAdjacencia::salvarEmArquivo(const string& nomeSaida) const {
         throw runtime_error("Erro ao criar arquivo de saída");
     }
 
-    // Usa lista ordenada apenas para visualização
     auto listaOrdenada = getListaOrdenada();
-    
+
     saida << "Lista de Adjacencia (" << n << " vertices):\n";
     for (int i = 0; i < n; i++) {
         saida << "Vertice " << (i + 1) << ": ";
@@ -51,9 +50,9 @@ void ListaAdjacencia::salvarEmArquivo(const string& nomeSaida) const {
 }
 
 void ListaAdjacencia::imprimir() const {
-    // Usa lista ordenada apenas para visualização
+
     auto listaOrdenada = getListaOrdenada();
-    
+
     cout << "Lista de Adjacencia (" << n << " vertices):\n";
     for (int i = 0; i < n; i++) {
         cout << "Vertice " << (i + 1) << ": ";

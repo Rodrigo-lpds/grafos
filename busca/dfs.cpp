@@ -6,57 +6,49 @@
 
 DFS::DFS(int numVertices) : n(numVertices) {
     marcado.resize(n, false);
-    pai.resize(n, -1); // -1 indica que não tem pai (ou é raiz)
-    nivel.resize(n, -1); // -1 indica que não foi visitado
+    pai.resize(n, -1);
+    nivel.resize(n, -1);
     ordem_visitacao.clear();
 }
 
 void DFS::executarDFS(const IGrafo& grafo, int verticeInicial) {
-    // Valida entrada
+
     if (verticeInicial < 1 || verticeInicial > n) {
         throw invalid_argument("Vértice inicial inválido");
     }
-    
-    reset(); // Limpa estado anterior
-    
-    // Converte para índice 0-based
+
+    reset();
+
     int s = verticeInicial - 1;
-    
-    // Definir pilha P com um elemento s
-    stack<pair<int, int>> P; // Par (vértice, pai) para rastrear árvore
+
+    stack<pair<int, int>> P;
     P.push({s, -1});
-    
-    // Enquanto P não estiver vazia
+
     while (!P.empty()) {
-        // Remover u de P (no topo da pilha)
+
         auto [u, pai_u] = P.top();
         P.pop();
-        
-        // Se u não estiver marcado
+
         if (!marcado[u]) {
-            // Marcar u
+
             marcado[u] = true;
             pai[u] = pai_u;
-            
-            // Define nível baseado no pai
+
             if (pai_u == -1) {
-                nivel[u] = 0; // Raiz tem nível 0
+                nivel[u] = 0;
             } else {
                 nivel[u] = nivel[pai_u] + 1;
             }
-            
-            ordem_visitacao.push_back(u + 1); // Salva como 1-based
-            
-            // Usar polimorfismo: getVizinhos funciona para qualquer tipo de grafo
+
+            ordem_visitacao.push_back(u + 1);
+
             vector<int> vizinhos = grafo.getVizinhos(u);
-            
-            // Percorremos em ordem reversa para manter a ordem lexicográfica
-            // quando vários vizinhos são adicionados à pilha
+
             for (int i = vizinhos.size() - 1; i >= 0; i--) {
                 int v = vizinhos[i];
-                
+
                 if (!marcado[v]) {
-                    // Adicionar v em P (no topo)
+
                     P.push({v, u});
                 }
             }
@@ -80,13 +72,13 @@ void DFS::imprimirResultado() const {
         cout << "Nenhum vértice foi visitado.\n";
         return;
     }
-    
+
     for (size_t i = 0; i < ordem_visitacao.size(); i++) {
         if (i > 0) cout << " -> ";
         cout << ordem_visitacao[i];
     }
     cout << "\n\n";
-    
+
     cout << "Árvore de Busca (Pai | Nível):\n";
     for (int i = 0; i < n; i++) {
         if (marcado[i]) {
@@ -100,7 +92,7 @@ void DFS::imprimirResultado() const {
         }
     }
     cout << "\n";
-    
+
     cout << "Vértices visitados: ";
     for (int i = 0; i < n; i++) {
         if (marcado[i]) {
@@ -108,7 +100,7 @@ void DFS::imprimirResultado() const {
         }
     }
     cout << "\n";
-    
+
     cout << "Vértices não visitados: ";
     for (int i = 0; i < n; i++) {
         if (!marcado[i]) {
@@ -123,22 +115,22 @@ void DFS::salvarResultado(const string& nomeArquivo) const {
     if (!arquivo) {
         throw runtime_error("Erro ao criar arquivo de resultado");
     }
-    
+
     arquivo << "DFS - Resultado da Busca em Profundidade\n";
     arquivo << "========================================\n\n";
-    
+
     arquivo << "Ordem de visitação:\n";
     if (ordem_visitacao.empty()) {
         arquivo << "Nenhum vértice foi visitado.\n";
         return;
     }
-    
+
     for (size_t i = 0; i < ordem_visitacao.size(); i++) {
         if (i > 0) arquivo << " -> ";
         arquivo << ordem_visitacao[i];
     }
     arquivo << "\n\n";
-    
+
     arquivo << "Árvore de Busca:\n";
     arquivo << "Vértice | Pai | Nível\n";
     arquivo << "--------|-----|-------\n";
@@ -154,7 +146,7 @@ void DFS::salvarResultado(const string& nomeArquivo) const {
         }
     }
     arquivo << "\n";
-    
+
     arquivo << "Vértices visitados: ";
     for (int i = 0; i < n; i++) {
         if (marcado[i]) {
@@ -162,7 +154,7 @@ void DFS::salvarResultado(const string& nomeArquivo) const {
         }
     }
     arquivo << "\n";
-    
+
     arquivo << "Vértices não visitados: ";
     for (int i = 0; i < n; i++) {
         if (!marcado[i]) {
@@ -203,7 +195,7 @@ int DFS::getPai(int vertice) const {
         return -1;
     }
     int paiIndex = pai[vertice - 1];
-    return (paiIndex == -1) ? -1 : paiIndex + 1; // Retorna em 1-based ou -1
+    return (paiIndex == -1) ? -1 : paiIndex + 1;
 }
 
 int DFS::getNivel(int vertice) const {

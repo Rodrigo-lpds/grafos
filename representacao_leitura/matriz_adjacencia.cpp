@@ -22,13 +22,12 @@ void MatrizAdjacencia::salvarEmArquivo(const string& nomeSaida) const {
     }
 
     saida << "Matriz de Adjacencia (" << n << "x" << n << "):\n";
-    
-    // Otimização: guarda referência da matriz fora do laço
+
     const auto& M = matriz;
     for (int i = 0; i < n; i++) {
-        const auto& linha = M[i];  // Evita acesso repetido à matriz[i]
+        const auto& linha = M[i];
         for (int j = 0; j < n; j++) {
-            saida << static_cast<int>(linha[j]) << " ";  // Cast para impressão
+            saida << static_cast<int>(linha[j]) << " ";
         }
         saida << "\n";
     }
@@ -36,13 +35,12 @@ void MatrizAdjacencia::salvarEmArquivo(const string& nomeSaida) const {
 
 void MatrizAdjacencia::imprimir() const {
     cout << "Matriz de Adjacencia (" << n << "x" << n << "):\n";
-    
-    // Otimização: guarda referência da matriz fora do laço
+
     const auto& M = matriz;
     for (int i = 0; i < n; i++) {
-        const auto& linha = M[i];  // Evita acesso repetido à matriz[i]
+        const auto& linha = M[i];
         for (int j = 0; j < n; j++) {
-            cout << static_cast<int>(linha[j]) << " ";  // Cast para impressão
+            cout << static_cast<int>(linha[j]) << " ";
         }
         cout << "\n";
     }

@@ -12,13 +12,11 @@ DadosGrafo LeitorGrafo::lerArquivo(const string& nomeArquivo) {
 
     DadosGrafo dados;
     string linha;
-    
-    // Lê número de vértices
+
     if (getline(arquivo, linha)) {
         dados.numVertices = stoi(linha);
     }
 
-    // Lê arestas
     while (getline(arquivo, linha)) {
         if (!linha.empty()) {
             istringstream iss(linha);
@@ -40,13 +38,11 @@ DadosGrafoPeso LeitorGrafo::lerArquivoComPeso(const string& nomeArquivo) {
 
     DadosGrafoPeso dados;
     string linha;
-    
-    // Lê número de vértices
+
     if (getline(arquivo, linha)) {
         dados.numVertices = stoi(linha);
     }
 
-    // Lê arestas com peso
     while (getline(arquivo, linha)) {
         if (!linha.empty()) {
             istringstream iss(linha);

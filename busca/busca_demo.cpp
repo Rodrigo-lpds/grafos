@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     string algoritmo = argv[2];
     string tipo = argv[3];
     int verticeInicial;
-    
+
     try {
         verticeInicial = stoi(argv[4]);
     } catch (exception& e) {
@@ -36,10 +36,9 @@ int main(int argc, char** argv) {
     }
 
     try {
-        // 1. Lê os dados do arquivo TXT
+
         string nomeArquivoEntrada = argv[1];
-        
-        // Extrai o nome base do arquivo (remove caminho e extensão)
+
         string nomeBase = nomeArquivoEntrada;
         size_t ultimaBarra = nomeBase.find_last_of("/\\");
         if (ultimaBarra != string::npos) {
@@ -49,27 +48,24 @@ int main(int argc, char** argv) {
         if (ultimoPonto != string::npos) {
             nomeBase = nomeBase.substr(0, ultimoPonto);
         }
-        
+
         DadosGrafo dados = LeitorGrafo::lerArquivo(argv[1]);
-        cout << "Grafo lido: " << dados.numVertices << " vertices, " 
+        cout << "Grafo lido: " << dados.numVertices << " vertices, "
              << dados.arestas.size() << " arestas\n";
         cout << "Vértice inicial: " << verticeInicial << "\n\n";
 
-        // Valida vértice inicial
         if (verticeInicial < 1 || verticeInicial > dados.numVertices) {
-            cerr << "Erro: Vértice inicial deve estar entre 1 e " 
+            cerr << "Erro: Vértice inicial deve estar entre 1 e "
                  << dados.numVertices << "\n";
             return 1;
         }
 
-        // Cria objetos BFS e DFS
         BFS bfs(dados.numVertices);
         DFS dfs(dados.numVertices);
 
-        // Executa BFS se solicitado
         if (algoritmo == "bfs" || algoritmo == "ambos") {
             cout << "========== BUSCA EM LARGURA (BFS) ==========\n";
-            
+
             if (tipo == "matriz" || tipo == "ambos") {
                 cout << "=== BFS usando Matriz de Adjacência ===\n";
                 MatrizAdjacencia matriz(dados);
@@ -91,10 +87,9 @@ int main(int argc, char** argv) {
             }
         }
 
-        // Executa DFS se solicitado
         if (algoritmo == "dfs" || algoritmo == "ambos") {
             cout << "======= BUSCA EM PROFUNDIDADE (DFS) =======\n";
-            
+
             if (tipo == "matriz" || tipo == "ambos") {
                 cout << "=== DFS usando Matriz de Adjacência ===\n";
                 MatrizAdjacencia matriz(dados);
@@ -116,18 +111,16 @@ int main(int argc, char** argv) {
             }
         }
 
-        // Validação dos parâmetros
         if (algoritmo != "bfs" && algoritmo != "dfs" && algoritmo != "ambos") {
             cout << "Algoritmo inválido. Use: bfs, dfs ou ambos\n";
             return 1;
         }
-        
+
         if (tipo != "matriz" && tipo != "lista" && tipo != "ambos") {
             cout << "Tipo inválido. Use: matriz, lista ou ambos\n";
             return 1;
         }
-        
-        // Mostra comparação se ambos algoritmos foram executados
+
         if (algoritmo == "ambos") {
             cout << "============= COMPARAÇÃO =============\n";
             cout << "BFS (Largura): ";
@@ -137,7 +130,7 @@ int main(int argc, char** argv) {
                 cout << ordem_bfs[i];
             }
             cout << "\n";
-            
+
             cout << "DFS (Profundidade): ";
             const auto& ordem_dfs = dfs.getOrdemVisitacao();
             for (size_t i = 0; i < ordem_dfs.size(); i++) {
@@ -145,7 +138,7 @@ int main(int argc, char** argv) {
                 cout << ordem_dfs[i];
             }
             cout << "\n\n";
-            
+
             if (ordem_bfs == ordem_dfs) {
                 cout << "📝 Os algoritmos visitaram os vértices na mesma ordem!\n";
             } else {
@@ -154,7 +147,7 @@ int main(int argc, char** argv) {
                 cout << "   DFS explora por profundidade (caminho mais fundo primeiro)\n";
             }
         }
-        
+
     } catch (exception& e) {
         cerr << "Erro: " << e.what() << endl;
         return 1;
