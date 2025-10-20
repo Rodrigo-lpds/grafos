@@ -8,6 +8,8 @@
 #include <sstream>
 #include <limits>
 #include <fstream>
+#include <chrono>
+#include <random>
 
 // Includes para as funcionalidades do projeto
 #include "representacao_leitura/leitor_grafo.h"
@@ -723,6 +725,148 @@ private:
         pausar();
     }
     
+    void benchmarkDijkstra() {
+        limparTela();
+        mostrarCabecalho();
+        
+        cout << "┌─────────────────────────────────────────────────────────────┐\n";
+        cout << "│                   BENCHMARK DIJKSTRA                       │\n";
+        cout << "└─────────────────────────────────────────────────────────────┘\n\n";
+        
+        if (!grafoPeso) {
+            cout << "❌ Esta funcionalidade está disponível apenas para grafos com peso!\n";
+            pausar();
+            return;
+        }
+        
+        if (!carregarGrafo()) {
+            pausar();
+            return;
+        }
+        
+        cout << "📊 Configuração do benchmark:\n\n";
+        
+        // Solicitar o número de vértices para o teste
+        cout << "👉 Digite o número de vértices de origem aleatórios para o teste (ex: 100): ";
+        int k;
+        cin >> k;
+        
+        if (k <= 0 || k > numVertices) {
+            cout << "❌ Número inválido! Deve ser entre 1 e " << numVertices << "\n";
+            pausar();
+            return;
+        }
+        
+        cout << "\n🎲 Gerando " << k << " vértices aleatórios...\n";
+        cout << "⏱️  Executando benchmarks...\n\n";
+        
+        try {
+            // Gerar vértices aleatórios
+            vector<int> verticesOrigem = gerarVerticesAleatorios(k, numVertices);
+            
+            // Executar benchmark para ambas as implementações
+            double tempoVetor = executarBenchmarkDijkstra(verticesOrigem, "vetor");
+            double tempoHeap = executarBenchmarkDijkstra(verticesOrigem, "heap");
+            
+            // Calcular médias
+            double mediaVetor = tempoVetor / k;
+            double mediaHeap = tempoHeap / k;
+            
+            // Mostrar resultados em tabela
+            mostrarResultadosBenchmark(tempoVetor, tempoHeap, mediaVetor, mediaHeap, k);
+            
+        } catch (const exception& e) {
+            cout << "❌ Erro durante o benchmark: " << e.what() << "\n";
+        }
+        
+        pausar();
+    }
+    
+    vector<int> gerarVerticesAleatorios(int k, int numVertices) {
+        vector<int> vertices;
+        random_device rd;
+        mt19937 gen(rd());
+        uniform_int_distribution<> dis(1, numVertices);
+        
+        for (int i = 0; i < k; i++) {
+            vertices.push_back(dis(gen));
+        }
+        
+        return vertices;
+    }
+    
+    double executarBenchmarkDijkstra(const vector<int>& vertices, const string& tipo) {
+        double tempoTotal = 0.0;
+        
+        cout << "🔄 Testando implementação " << tipo << "...\n";
+        
+        for (int vertice : vertices) {
+            auto inicio = chrono::high_resolution_clock::now();
+            
+            // Executar Dijkstra
+            if (tipo == "vetor") {
+                Dijkstra::dijkstraVetor(*listaPeso, vertice);
+            } else {
+                Dijkstra::dijkstraHeap(*listaPeso, vertice);
+            }
+            
+            auto fim = chrono::high_resolution_clock::now();
+            auto duracao = chrono::duration_cast<chrono::microseconds>(fim - inicio);
+            tempoTotal += duracao.count() / 1000.0; // Converter para milissegundos
+        }
+        
+        return tempoTotal;
+    }
+    
+    void mostrarResultadosBenchmark(double tempoVetor, double tempoHeap, 
+                                  double mediaVetor, double mediaHeap, int k) {
+        cout << "\n📊 RESULTADOS DO BENCHMARK DIJKSTRA:\n";
+        cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        cout << "Grafo: " << grafoSelecionado << "\n";
+        cout << "Número de vértices testados: " << k << "\n";
+        cout << "Número total de vértices do grafo: " << numVertices << "\n\n";
+        
+        cout << "┌─────────────────────────────────────────────────────────────┐\n";
+        cout << "│                         RESULTADOS                         │\n";
+        cout << "├─────────────────────────────────────────────────────────────┤\n";
+        cout << "│ Implementação    │ Tempo Total (ms) │ Tempo Médio (ms)   │\n";
+        cout << "├─────────────────────────────────────────────────────────────┤\n";
+        cout << "│ Dijkstra Vetor   │ " << fixed << setprecision(3) << setw(12) << tempoVetor 
+             << "     │ " << setw(14) << mediaVetor << "     │\n";
+        cout << "│ Dijkstra Heap    │ " << setw(12) << tempoHeap 
+             << "     │ " << setw(14) << mediaHeap << "     │\n";
+        cout << "└─────────────────────────────────────────────────────────────┘\n\n";
+        
+        // Análise comparativa
+        double speedup = tempoVetor / tempoHeap;
+        if (speedup > 1.0) {
+            cout << "📈 ANÁLISE:\n";
+            cout << "🔸 Implementação com Heap é " << fixed << setprecision(2) 
+                 << speedup << "x mais rápida que a implementação com Vetor\n";
+            cout << "🔸 Diferença absoluta: " << fixed << setprecision(3) 
+                 << (tempoVetor - tempoHeap) << " ms no tempo total\n";
+            cout << "🔸 Diferença média por execução: " << fixed << setprecision(3) 
+                 << (mediaVetor - mediaHeap) << " ms\n";
+        } else {
+            cout << "📈 ANÁLISE:\n";
+            cout << "🔸 Implementação com Vetor é " << fixed << setprecision(2) 
+                 << (1.0 / speedup) << "x mais rápida que a implementação com Heap\n";
+            cout << "🔸 Diferença absoluta: " << fixed << setprecision(3) 
+                 << (tempoHeap - tempoVetor) << " ms no tempo total\n";
+            cout << "🔸 Diferença média por execução: " << fixed << setprecision(3) 
+                 << (mediaHeap - mediaVetor) << " ms\n";
+        }
+        
+        cout << "\n💡 RECOMENDAÇÃO:\n";
+        if (speedup > 1.1) {
+            cout << "🔸 Para este grafo, prefira a implementação com Heap para melhor performance\n";
+        } else if (speedup < 0.9) {
+            cout << "🔸 Para este grafo, a implementação com Vetor tem melhor performance\n";
+        } else {
+            cout << "🔸 Ambas as implementações têm performance similar para este grafo\n";
+        }
+    }
+    
     void mostrarConfiguracaoAtual() {
         cout << "\n┌─────────────────────────────────────────────────────────────┐\n";
         cout << "│                    CONFIGURAÇÃO ATUAL                      │\n";
@@ -761,7 +905,8 @@ public:
             cout << "🔍 ANÁLISES:\n";
             cout << "   4. Executar algoritmos de busca\n";
             cout << "   5. Analisar estatísticas do grafo\n";
-            cout << "   6. Calcular distâncias (grafos sem peso)\n\n";
+            cout << "   6. Calcular distâncias (grafos sem peso)\n";
+            cout << "   7. Benchmark Dijkstra (grafos com peso)\n\n";
             
             cout << "   0. Sair\n\n";
             cout << "👉 Digite sua opção: ";
@@ -786,6 +931,9 @@ public:
                     break;
                 case 6:
                     analisarDistancias();
+                    break;
+                case 7:
+                    benchmarkDijkstra();
                     break;
                 case 0:
                     limparTela();
