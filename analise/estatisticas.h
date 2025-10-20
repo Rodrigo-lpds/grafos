@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <string>
+#include "../representacao_leitura/grafo_interface.h"
+#include "../representacao_leitura/lista_adjacencia_adapter.h"
+#include "../representacao_leitura/matriz_adjacencia_adapter.h"
 #include "../representacao_leitura/lista_adjacencia.h"
 #include "componentes.h"
 #include "distancias.h"
@@ -34,24 +37,27 @@ private:
     int n;
     EstatisticasGrafo stats;
 
-    vector<int> calcularGraus_Lista(const ListaAdjacencia& lista);
+    // Métodos genéricos usando interface IGrafo
+    vector<int> calcularGraus(const IGrafo& grafo);
+    void calcularDiametro(const IGrafo& grafo);
+    void analisarBuscas(const IGrafo& grafo);
+    void calcularDistanciasEspecificas(const IGrafo& grafo);
+
+    // Métodos auxiliares
     void calcularEstatisticasGrau(const vector<int>& graus);
     double calcularMediana(const vector<int>& graus);
-    void calcularDiametro_Lista(const ListaAdjacencia& lista);
-    void analisarBuscas_Lista(const ListaAdjacencia& lista);
-    void calcularDistanciasEspecificas_Lista(const ListaAdjacencia& lista);
 
 public:
     Estatisticas(int numVertices);
 
-    void calcularEstatisticas_Lista(const ListaAdjacencia& lista, int numArestas);
+    // Métodos genéricos usando interface IGrafo
+    void calcularEstatisticas(const IGrafo& grafo, int numArestas);
+    void executarAnaliseCompleta(const IGrafo& grafo);
 
     void adicionarInformacoesComponentes(const ComponentesConexas& componentes);
 
     void imprimirEstatisticas() const;
     void salvarRelatorio(const string& nomeArquivo) const;
-
-    void executarAnaliseCompleta_Lista(const ListaAdjacencia& lista);
 
     const EstatisticasGrafo& getEstatisticas() const;
 };

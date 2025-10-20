@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include "../representacao_leitura/grafo_interface.h"
 #include "../representacao_leitura/matriz_adjacencia.h"
 #include "../representacao_leitura/lista_adjacencia.h"
 #include "../busca/bfs.h"
@@ -27,17 +28,11 @@ public:
 
     Distancias(int numVertices);
 
-    void calcularDistancias_Matriz(const MatrizAdjacencia& matriz);
-
-    void calcularDistancias_Lista(const ListaAdjacencia& lista);
-
-    void calcularDiametroApenas_Lista(const ListaAdjacencia& lista);
-
-    int calcularDistanciaEspecifica_Matriz(const MatrizAdjacencia& matriz, int origem, int destino) const;
-    int calcularDistanciaEspecifica_Lista(const ListaAdjacencia& lista, int origem, int destino) const;
-
-    int getDistancia_Lista(const ListaAdjacencia& lista, int origem, int destino) const;
-    int getDistancia_Matriz(const MatrizAdjacencia& matriz, int origem, int destino) const;
+    // Métodos genéricos usando interface IGrafo
+    void calcularDistancias(const IGrafo& grafo);
+    vector<int> bfs_distancias(const IGrafo& grafo, int origem);
+    int calcularDistanciaEspecifica(const IGrafo& grafo, int origem, int destino) const;
+    int getDistancia(const IGrafo& grafo, int origem, int destino) const;
 
     int getDiametro() const;
 

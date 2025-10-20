@@ -10,78 +10,6 @@ ComponentesConexas::ComponentesConexas(int numVertices) : n(numVertices) {
     componentes.clear();
 }
 
-void ComponentesConexas::encontrarComponentes_Matriz(const MatrizAdjacencia& matriz) {
-    reset();
-
-    DFS dfs(n);
-    int id_componente = 1;
-
-    for (int v = 0; v < n; v++) {
-        if (!visitado[v]) {
-
-            dfs.reset();
-            dfs.executarDFS_Matriz(matriz, v + 1);
-
-            const vector<int>& ordem_visitacao = dfs.getOrdemVisitacao();
-
-            for (int vertice_1based : ordem_visitacao) {
-                int vertice_0based = vertice_1based - 1;
-                visitado[vertice_0based] = true;
-            }
-
-            componentes.emplace_back(id_componente++, ordem_visitacao);
-        }
-    }
-
-    sort(componentes.begin(), componentes.end(),
-         [](const Componente& a, const Componente& b) {
-             if (a.tamanho != b.tamanho) {
-                 return a.tamanho > b.tamanho;
-             }
-             return a.vertices[0] < b.vertices[0];
-         });
-
-    for (size_t i = 0; i < componentes.size(); i++) {
-        componentes[i].id = i + 1;
-    }
-}
-
-void ComponentesConexas::encontrarComponentes_Lista(const ListaAdjacencia& lista) {
-    reset();
-
-    DFS dfs(n);
-    int id_componente = 1;
-
-    for (int v = 0; v < n; v++) {
-        if (!visitado[v]) {
-
-            dfs.reset();
-            dfs.executarDFS_Lista(lista, v + 1);
-
-            const vector<int>& ordem_visitacao = dfs.getOrdemVisitacao();
-
-            for (int vertice_1based : ordem_visitacao) {
-                int vertice_0based = vertice_1based - 1;
-                visitado[vertice_0based] = true;
-            }
-
-            componentes.emplace_back(id_componente++, ordem_visitacao);
-        }
-    }
-
-    sort(componentes.begin(), componentes.end(),
-         [](const Componente& a, const Componente& b) {
-             if (a.tamanho != b.tamanho) {
-                 return a.tamanho > b.tamanho;
-             }
-             return a.vertices[0] < b.vertices[0];
-         });
-
-    for (size_t i = 0; i < componentes.size(); i++) {
-        componentes[i].id = i + 1;
-    }
-}
-
 int ComponentesConexas::getNumComponentes() const {
     return componentes.size();
 }
@@ -208,4 +136,43 @@ void ComponentesConexas::imprimirEstatisticas() const {
 void ComponentesConexas::reset() {
     fill(visitado.begin(), visitado.end(), false);
     componentes.clear();
+}
+
+// Implementação do método genérico usando interface IGrafo
+void ComponentesConexas::encontrarComponentes(const IGrafo& grafo) {
+    reset();
+
+    DFS dfs(n);
+    int id_componente = 1;
+
+    for (int v = 0; v < n; v++) {
+        if (!visitado[v]) {
+
+            dfs.reset();
+            dfs.executarDFS(grafo, v + 1); // Convertendo para base 1 para DFS
+
+            const vector<int>& ordem_visitacao = dfs.getOrdemVisitacao();
+
+            for (int vertice_1based : ordem_visitacao) {
+                int vertice_0based = vertice_1based - 1;
+                visitado[vertice_0based] = true;
+            }
+
+            componentes.emplace_back(id_componente++, ordem_visitacao);
+        }
+    }
+
+    // Ordena componentes por tamanho (maior primeiro) e depois por menor vértice
+    sort(componentes.begin(), componentes.end(),
+         [](const Componente& a, const Componente& b) {
+             if (a.tamanho != b.tamanho) {
+                 return a.tamanho > b.tamanho;
+             }
+             return a.vertices[0] < b.vertices[0];
+         });
+
+    // Renumera os IDs dos componentes após ordenação
+    for (size_t i = 0; i < componentes.size(); i++) {
+        componentes[i].id = i + 1;
+    }
 }

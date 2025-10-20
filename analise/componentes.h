@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include "../representacao_leitura/grafo_interface.h"
 #include "../representacao_leitura/matriz_adjacencia.h"
 #include "../representacao_leitura/lista_adjacencia.h"
 using namespace std;
@@ -29,9 +30,8 @@ public:
 
     ComponentesConexas(int numVertices);
 
-    void encontrarComponentes_Matriz(const MatrizAdjacencia& matriz);
-
-    void encontrarComponentes_Lista(const ListaAdjacencia& lista);
+    // Método genérico usando interface IGrafo
+    void encontrarComponentes(const IGrafo& grafo);
 
     int getNumComponentes() const;
 
