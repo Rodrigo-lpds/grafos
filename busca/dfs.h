@@ -6,6 +6,9 @@
 #include <string>
 #include "../representacao_leitura/matriz_adjacencia.h"
 #include "../representacao_leitura/lista_adjacencia.h"
+#include "../representacao_leitura/grafo_interface.h"
+#include "../representacao_leitura/matriz_adjacencia_adapter.h"
+#include "../representacao_leitura/lista_adjacencia_adapter.h"
 using namespace std;
 
 class DFS {
@@ -20,10 +23,11 @@ public:
     // Construtor
     DFS(int numVertices);
     
-    // DFS usando matriz de adjacência
-    void executarDFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial);
+    // DFS usando qualquer implementação de grafo (POLIMORFISMO - SOLID)
+    void executarDFS(const IGrafo& grafo, int verticeInicial);
     
-    // DFS usando lista de adjacência
+    // Métodos de conveniência mantidos para compatibilidade
+    void executarDFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial);
     void executarDFS_Lista(const ListaAdjacencia& lista, int verticeInicial);
     
     // Imprime resultado da DFS

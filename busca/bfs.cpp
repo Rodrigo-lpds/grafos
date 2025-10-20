@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <algorithm>
 
 BFS::BFS(int numVertices) : n(numVertices) {
     marcado.resize(n, false);
@@ -10,7 +11,7 @@ BFS::BFS(int numVertices) : n(numVertices) {
     ordem_visitacao.clear();
 }
 
-void BFS::executarBFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial, int destino) {
+void BFS::executarBFS(const IGrafo& grafo, int verticeInicial, int destino) {
     // Valida entrada
     if (verticeInicial < 1 || verticeInicial > n) {
         throw invalid_argument("Vértice inicial inválido");
@@ -47,74 +48,11 @@ void BFS::executarBFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial,
         int v = Q.front();
         Q.pop();
         
-        // Otimização: guarda referência da matriz fora do laço
-        const auto& M = matriz.getMatriz();
-        const auto& linha_v = M[v];
+        // Usar polimorfismo: getVizinhos funciona para qualquer tipo de grafo
+        vector<int> vizinhos = grafo.getVizinhos(v);
         
-        // Para todo vizinho w de v faça
-        for (int w = 0; w < n; w++) {
-            // Verifica se existe aresta v->w na matriz (matriz[v][w] == 1)
-            if (linha_v[w] == 1) {
-                // Se w não estiver marcado
-                if (!marcado[w]) {
-                    // marcar w
-                    marcado[w] = true;
-                    nivel[w] = nivel[v] + 1; // Nível do filho = nível do pai + 1
-                    pai[w] = v; // Define o pai na árvore de busca
-                    // inserir w em Q
-                    Q.push(w);
-                    ordem_visitacao.push_back(w + 1); // Salva como 1-based
-                    if (d != -1 && w == d) {
-                        return;
-                    }
-                }
-            }
-        }
-    }
-}
-
-void BFS::executarBFS_Lista(const ListaAdjacencia& lista, int verticeInicial, int destino) {
-    // Valida entrada
-    if (verticeInicial < 1 || verticeInicial > n) {
-        throw invalid_argument("Vértice inicial inválido");
-    }
-    
-    if (destino != -1 && (destino < 1 || destino > n)) {
-        throw invalid_argument("Vértice destino inválido");
-    }
-    
-    reset(); // Limpa estado anterior
-    
-    // Converte para índice 0-based
-    int s = verticeInicial - 1;
-    int d = (destino == -1) ? -1 : destino - 1;
-    
-    // Definir fila Q vazia
-    queue<int> Q;
-    
-    // Marcar s e inserir s na fila Q
-    marcado[s] = true;
-    nivel[s] = 0; // Raiz tem nível 0
-    pai[s] = -1; // Raiz não tem pai
-    Q.push(s);
-    ordem_visitacao.push_back(s + 1); // Salva como 1-based
-    
-    // Se origem é igual ao destino, já terminou
-    if (d != -1 && s == d) {
-        return;
-    }
-    
-    // Enquanto Q não estiver vazia
-    while (!Q.empty()) {
-        // Retirar v de Q
-        int v = Q.front();
-        Q.pop();
-        
-        // Para todo vizinho w de v faça
-        const vector<int>& vizinhos = lista.getLista()[v];
-        for (int w_1based : vizinhos) {
-            int w = w_1based - 1; // Converte para 0-based
-            
+        // Para todo vizinho w de v
+        for (int w : vizinhos) {
             // Se w não estiver marcado
             if (!marcado[w]) {
                 // marcar w
@@ -125,13 +63,23 @@ void BFS::executarBFS_Lista(const ListaAdjacencia& lista, int verticeInicial, in
                 Q.push(w);
                 ordem_visitacao.push_back(w + 1); // Salva como 1-based
                 
-                // Se encontrou o destino, pode parar (apenas se destino foi especificado)
+                // Parada antecipada se chegou ao destino
                 if (d != -1 && w == d) {
                     return;
                 }
             }
         }
     }
+}
+
+void BFS::executarBFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial, int destino) {
+    MatrizAdjacenciaAdapter adapter(matriz);
+    executarBFS(adapter, verticeInicial, destino);
+}
+
+void BFS::executarBFS_Lista(const ListaAdjacencia& lista, int verticeInicial, int destino) {
+    ListaAdjacenciaAdapter adapter(lista);
+    executarBFS(adapter, verticeInicial, destino);
 }
 
 void BFS::imprimirResultado() const {

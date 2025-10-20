@@ -11,7 +11,7 @@ DFS::DFS(int numVertices) : n(numVertices) {
     ordem_visitacao.clear();
 }
 
-void DFS::executarDFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial) {
+void DFS::executarDFS(const IGrafo& grafo, int verticeInicial) {
     // Valida entrada
     if (verticeInicial < 1 || verticeInicial > n) {
         throw invalid_argument("Vértice inicial inválido");
@@ -22,64 +22,19 @@ void DFS::executarDFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial)
     // Converte para índice 0-based
     int s = verticeInicial - 1;
     
-    stack<pair<int, int>> P;
-    P.push({s, -1});
-    
-    while (!P.empty()) {
-        auto [u, pai_u] = P.top();
-        P.pop();
-        
-        if (!marcado[u]) {
-            marcado[u] = true;
-            pai[u] = pai_u;
-            
-            if (pai_u == -1) {
-                nivel[u] = 0;
-            } else {
-                nivel[u] = nivel[pai_u] + 1;
-            }
-            
-            ordem_visitacao.push_back(u + 1);
-
-            const auto& M = matriz.getMatriz();
-            const auto& linha_u = M[u];
-            
-            for (int v = n - 1; v >= 0; v--) {
-                if (linha_u[v] == 1 && !marcado[v]) {
-                    P.push({v, u});
-                }
-            }
-        }
-    }
-}
-
-void DFS::executarDFS_Lista(const ListaAdjacencia& lista, int verticeInicial) {
-    // Valida entrada
-    if (verticeInicial < 1 || verticeInicial > n) {
-        throw invalid_argument("Vértice inicial inválido");
-    }
-    
-    reset(); // Limpa estado anterior
-    
-    // Converte para índice 0-based
-    int s = verticeInicial - 1;
-    
-    // 1. DFS(s)
-    // 2. Desmarcar todos os vértices (já feito no reset())
-    
-    // 3. Definir pilha P com um elemento s
+    // Definir pilha P com um elemento s
     stack<pair<int, int>> P; // Par (vértice, pai) para rastrear árvore
     P.push({s, -1});
     
-    // 4. Enquanto P não estiver vazia
+    // Enquanto P não estiver vazia
     while (!P.empty()) {
-        // 5. Remover u de P // no topo da pilha
+        // Remover u de P (no topo da pilha)
         auto [u, pai_u] = P.top();
         P.pop();
         
-        // 6. Se u não estiver marcado
+        // Se u não estiver marcado
         if (!marcado[u]) {
-            // 7. Marcar u
+            // Marcar u
             marcado[u] = true;
             pai[u] = pai_u;
             
@@ -92,23 +47,31 @@ void DFS::executarDFS_Lista(const ListaAdjacencia& lista, int verticeInicial) {
             
             ordem_visitacao.push_back(u + 1); // Salva como 1-based
             
-            // 8. Para cada aresta (u,v) incidente a u
-            const vector<int>& vizinhos = lista.getLista()[u];
+            // Usar polimorfismo: getVizinhos funciona para qualquer tipo de grafo
+            vector<int> vizinhos = grafo.getVizinhos(u);
             
             // Percorremos em ordem reversa para manter a ordem lexicográfica
             // quando vários vizinhos são adicionados à pilha
-            vector<int> vizinhos_vec(vizinhos.begin(), vizinhos.end());
-            for (int i = vizinhos_vec.size() - 1; i >= 0; i--) {
-                int v_1based = vizinhos_vec[i];
-                int v = v_1based - 1; // Converte para 0-based
+            for (int i = vizinhos.size() - 1; i >= 0; i--) {
+                int v = vizinhos[i];
                 
                 if (!marcado[v]) {
-                    // 9. Adicionar v em P // no topo
+                    // Adicionar v em P (no topo)
                     P.push({v, u});
                 }
             }
         }
     }
+}
+
+void DFS::executarDFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial) {
+    MatrizAdjacenciaAdapter adapter(matriz);
+    executarDFS(adapter, verticeInicial);
+}
+
+void DFS::executarDFS_Lista(const ListaAdjacencia& lista, int verticeInicial) {
+    ListaAdjacenciaAdapter adapter(lista);
+    executarDFS(adapter, verticeInicial);
 }
 
 void DFS::imprimirResultado() const {

@@ -6,6 +6,9 @@
 #include <string>
 #include "../representacao_leitura/matriz_adjacencia.h"
 #include "../representacao_leitura/lista_adjacencia.h"
+#include "../representacao_leitura/grafo_interface.h"
+#include "../representacao_leitura/matriz_adjacencia_adapter.h"
+#include "../representacao_leitura/lista_adjacencia_adapter.h"
 using namespace std;
 
 class BFS {
@@ -20,10 +23,11 @@ public:
     // Construtor
     BFS(int numVertices);
     
-    // BFS usando matriz de adjacência (com parada antecipada opcional)
-    void executarBFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial, int destino = -1);
+    // BFS usando qualquer implementação de grafo (POLIMORFISMO - SOLID)
+    void executarBFS(const IGrafo& grafo, int verticeInicial, int destino = -1);
     
-    // BFS usando lista de adjacência (com parada antecipada opcional)
+    // Métodos de conveniência mantidos para compatibilidade
+    void executarBFS_Matriz(const MatrizAdjacencia& matriz, int verticeInicial, int destino = -1);
     void executarBFS_Lista(const ListaAdjacencia& lista, int verticeInicial, int destino = -1);
     
     // Imprime resultado da BFS
