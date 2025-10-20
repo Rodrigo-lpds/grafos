@@ -10,9 +10,15 @@ struct DadosGrafo {
     vector<pair<int, int>> arestas;
 };
 
+struct DadosGrafoPeso {
+    int numVertices;
+    vector<tuple<int, int, double>> arestas; // (u, v, peso)
+};
+
 class LeitorGrafo {
 public:
     static DadosGrafo lerArquivo(const string& nomeArquivo);
+    static DadosGrafoPeso lerArquivoComPeso(const string& nomeArquivo);
 };
 
 #endif
