@@ -4,44 +4,41 @@
 #include <algorithm>
 #include <iomanip>
 
-ResultadoDijkstra Dijkstra::dijkstraVetor(const ListaAdjacenciaPeso& grafo, int origem) {
+const double INF = numeric_limits<double>::infinity();
+
+ResultadoDijkstra Dijkstra::executar(const IGrafoPeso& grafo, int origem, 
+                                    unique_ptr<IDijkstraStrategy> strategy) {
     int n = grafo.getNumVertices();
-    const auto& lista = grafo.getLista();
     
     ResultadoDijkstra resultado;
     resultado.origem = origem;
     resultado.distancias.assign(n, INF);
     resultado.predecessores.assign(n, -1);
     
-    vector<bool> visitado(n, false);
+    // Inicializar estratégia
+    strategy->inicializar(n);
     
     // Ajustar para indexação baseada em 0
     int origemIdx = origem - 1;
     resultado.distancias[origemIdx] = 0;
+    strategy->inserirOuAtualizar(origemIdx, 0);
     
-    for (int i = 0; i < n; i++) {
-        // Encontrar o vértice não visitado com menor distância
-        int u = -1;
-        for (int v = 0; v < n; v++) {
-            if (!visitado[v] && (u == -1 || resultado.distancias[v] < resultado.distancias[u])) {
-                u = v;
-            }
-        }
+    // Algoritmo de Dijkstra usando polimorfismo
+    while (!strategy->vazio()) {
+        int u = strategy->extrairMinimo();
         
         if (u == -1 || resultado.distancias[u] == INF) {
             break; // Não há mais vértices alcançáveis
         }
         
-        visitado[u] = true;
+        // Relaxar todas as arestas saindo de u (usando polimorfismo)
+        vector<pair<int, double>> vizinhos = grafo.getVizinhosComPeso(u);
         
-        // Relaxar todas as arestas saindo de u
-        for (const auto& vizinho : lista[u]) {
-            int v = vizinho.first - 1; // Converter para indexação baseada em 0
-            double peso = vizinho.second;
-            
-            if (!visitado[v] && resultado.distancias[u] + peso < resultado.distancias[v]) {
+        for (const auto& [v, peso] : vizinhos) {
+            if (resultado.distancias[u] + peso < resultado.distancias[v]) {
                 resultado.distancias[v] = resultado.distancias[u] + peso;
                 resultado.predecessores[v] = u + 1; // Manter indexação baseada em 1
+                strategy->inserirOuAtualizar(v, resultado.distancias[v]);
             }
         }
     }
@@ -49,46 +46,16 @@ ResultadoDijkstra Dijkstra::dijkstraVetor(const ListaAdjacenciaPeso& grafo, int 
     return resultado;
 }
 
+ResultadoDijkstra Dijkstra::dijkstraVetor(const ListaAdjacenciaPeso& grafo, int origem) {
+    ListaAdjacenciaPesoAdapter adapter(grafo);
+    auto strategy = make_unique<DijkstraVetorStrategy>();
+    return executar(adapter, origem, move(strategy));
+}
+
 ResultadoDijkstra Dijkstra::dijkstraHeap(const ListaAdjacenciaPeso& grafo, int origem) {
-    int n = grafo.getNumVertices();
-    const auto& lista = grafo.getLista();
-    
-    ResultadoDijkstra resultado;
-    resultado.origem = origem;
-    resultado.distancias.assign(n, INF);
-    resultado.predecessores.assign(n, -1);
-    
-    // Priority queue: pair<distancia, vertice> - menor distância tem prioridade
-    priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq;
-    
-    // Ajustar para indexação baseada em 0
-    int origemIdx = origem - 1;
-    resultado.distancias[origemIdx] = 0;
-    pq.push({0, origemIdx});
-    
-    while (!pq.empty()) {
-        auto [distAtual, u] = pq.top();
-        pq.pop();
-        
-        // Se a distância no heap é maior que a já computada, ignorar
-        if (distAtual > resultado.distancias[u]) {
-            continue;
-        }
-        
-        // Relaxar todas as arestas saindo de u
-        for (const auto& vizinho : lista[u]) {
-            int v = vizinho.first - 1; // Converter para indexação baseada em 0
-            double peso = vizinho.second;
-            
-            if (resultado.distancias[u] + peso < resultado.distancias[v]) {
-                resultado.distancias[v] = resultado.distancias[u] + peso;
-                resultado.predecessores[v] = u + 1; // Manter indexação baseada em 1
-                pq.push({resultado.distancias[v], v});
-            }
-        }
-    }
-    
-    return resultado;
+    ListaAdjacenciaPesoAdapter adapter(grafo);
+    auto strategy = make_unique<DijkstraHeapStrategy>();
+    return executar(adapter, origem, move(strategy));
 }
 
 void Dijkstra::imprimirResultado(const ResultadoDijkstra& resultado) {
