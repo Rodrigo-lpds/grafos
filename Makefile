@@ -8,7 +8,7 @@ BUSCA_DIR = busca
 ANALISE_DIR = analise
 
 # Arquivos objeto comuns (com caminhos atualizados)
-COMMON_OBJS = $(REPR_DIR)/leitor_grafo.o $(REPR_DIR)/matriz_adjacencia.o $(REPR_DIR)/lista_adjacencia.o $(REPR_DIR)/lista_adjacencia_peso.o
+COMMON_OBJS = $(REPR_DIR)/leitor_grafo.o $(REPR_DIR)/matriz_adjacencia.o $(REPR_DIR)/lista_adjacencia.o $(REPR_DIR)/lista_adjacencia_peso.o mapping.o
 
 # Executáveis
 all: menu_interativo

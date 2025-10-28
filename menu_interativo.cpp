@@ -10,8 +10,10 @@
 #include <fstream>
 #include <chrono>
 #include <random>
+#include <stdexcept>
 
 // Includes para as funcionalidades do projeto
+#include "mapping.h"
 #include "representacao_leitura/leitor_grafo.h"
 #include "representacao_leitura/matriz_adjacencia.h"
 #include "representacao_leitura/lista_adjacencia.h"
@@ -41,6 +43,7 @@ private:
     unique_ptr<MatrizAdjacencia> matriz;
     unique_ptr<ListaAdjacencia> lista;
     unique_ptr<ListaAdjacenciaPeso> listaPeso;
+    unique_ptr<Mapping> mappingPesquisadores;
     int numVertices;
     
     void limparTela() {
@@ -148,6 +151,7 @@ private:
         
         grafoSelecionado = grafos[escolha - 1];
         grafoPeso = verificarSeGrafoPeso(grafoSelecionado);
+        mappingPesquisadores.reset();
         
         cout << "\n✅ Grafo selecionado: " << grafoSelecionado;
         if (grafoPeso) {
@@ -279,6 +283,283 @@ private:
         } catch (const exception& e) {
             cout << "❌ Erro ao carregar grafo: " << e.what() << "\n";
             return false;
+        }
+    }
+    
+    bool garantirMappingPesquisadores() {
+        if (grafoSelecionado != "rede_coloracao.txt") {
+            cout << "❌ Esta funcionalidade está disponível apenas para o grafo 'rede_coloracao.txt'.\n";
+            return false;
+        }
+        
+        if (!grafoPeso) {
+            cout << "❌ O grafo selecionado precisa ser do tipo com peso para habilitar o mapeamento.\n";
+            return false;
+        }
+        
+        if (!mappingPesquisadores) {
+            cout << "\n⏳ Carregando mapeamento de pesquisadores...\n";
+            try {
+                mappingPesquisadores = make_unique<Mapping>(
+                    "pesquisadores/pesquisadores.txt",
+                    "grafos/" + grafoSelecionado
+                );
+                cout << "✅ Mapeamento carregado com "
+                     << mappingPesquisadores->totalPesquisadores()
+                     << " pesquisadores.\n";
+            } catch (const exception& e) {
+                cout << "❌ Erro ao carregar mapeamento: " << e.what() << "\n";
+                mappingPesquisadores.reset();
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    void consultarPesquisadores() {
+        limparTela();
+        mostrarCabecalho();
+
+        cout << "┌─────────────────────────────────────────────────────────────┐\n";
+        cout << "│                 CONSULTA DE PESQUISADORES                   │\n";
+        cout << "└─────────────────────────────────────────────────────────────┘\n";
+
+        if (!garantirMappingPesquisadores()) {
+            pausar();
+            return;
+        }
+
+        cout << "\nSelecione a operação desejada:\n\n";
+        cout << "1. Buscar ID pelo nome\n";
+        cout << "2. Buscar nome pelo ID\n";
+        cout << "3. Calcular distância entre pesquisadores (Dijkstra)\n";
+        cout << "0. Voltar\n\n";
+        cout << "👉 Digite sua escolha: ";
+
+        int escolha;
+        cin >> escolha;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (escolha) {
+            case 1: {
+                cout << "\nNome completo do pesquisador: ";
+                string nome;
+                getline(cin, nome);
+
+                if (nome.empty()) {
+                    cout << "\n❌ Nome vazio. Tente novamente.\n";
+                    break;
+                }
+
+                try {
+                    vector<int> ids = mappingPesquisadores->obterIdsPorNome(nome);
+                    cout << "\n✅ Pesquisador encontrado!\n";
+                    if (ids.size() == 1) {
+                        int id = ids.front();
+                        const string& nomePadrao = mappingPesquisadores->obterNomePorId(id);
+                        cout << "   Nome: " << nomePadrao << "\n";
+                        cout << "   ID: " << id << "\n";
+                    } else {
+                        cout << "   Foram encontrados " << ids.size() << " IDs correspondentes:\n";
+                        for (int id : ids) {
+                            const string& nomePadrao = mappingPesquisadores->obterNomePorId(id);
+                            cout << "     - ID " << id << ": " << nomePadrao << "\n";
+                        }
+                    }
+                } catch (const out_of_range&) {
+                    cout << "\n❌ Nome não encontrado. Verifique a grafia exata.\n";
+                }
+                break;
+            }
+            case 2: {
+                cout << "\nID do pesquisador: ";
+                int id = 0;
+                cin >> id;
+
+                if (!cin) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "\n❌ Entrada inválida para ID.\n";
+                    break;
+                }
+
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                try {
+                    const string& nome = mappingPesquisadores->obterNomePorId(id);
+                    cout << "\n✅ Pesquisador encontrado!\n";
+                    cout << "   ID: " << id << "\n";
+                    cout << "   Nome: " << nome << "\n";
+                } catch (const out_of_range&) {
+                    cout << "\n❌ ID não encontrado.\n";
+                }
+                break;
+            }
+            case 3:
+                calcularDistanciaEntrePesquisadores();
+                break;
+            case 0:
+                return;
+            default:
+                cout << "\n❌ Opção inválida!\n";
+                break;
+        }
+
+        pausar();
+    }
+
+    void calcularDistanciaEntrePesquisadores() {
+        limparTela();
+        mostrarCabecalho();
+
+        cout << "┌─────────────────────────────────────────────────────────────┐\n";
+        cout << "│          DISTÂNCIA ENTRE PESQUISADORES (DIJKSTRA)          │\n";
+        cout << "└─────────────────────────────────────────────────────────────┘\n\n";
+
+        if (!carregarGrafo()) {
+            pausar();
+            return;
+        }
+
+        cout << "📝 Digite os nomes dos pesquisadores para calcular a distância:\n\n";
+
+        // Pesquisador de origem
+        cout << "👤 Nome do pesquisador de origem: ";
+        string nomeOrigem;
+        getline(cin, nomeOrigem);
+
+        if (nomeOrigem.empty()) {
+            cout << "\n❌ Nome vazio. Operação cancelada.\n";
+            return;
+        }
+
+        // Pesquisador de destino
+        cout << "👤 Nome do pesquisador de destino: ";
+        string nomeDestino;
+        getline(cin, nomeDestino);
+
+        if (nomeDestino.empty()) {
+            cout << "\n❌ Nome vazio. Operação cancelada.\n";
+            return;
+        }
+
+        try {
+            // Obter IDs dos pesquisadores
+            vector<int> idsOrigem = mappingPesquisadores->obterIdsPorNome(nomeOrigem);
+            vector<int> idsDestino = mappingPesquisadores->obterIdsPorNome(nomeDestino);
+
+            int idOrigem, idDestino;
+
+            // Tratar múltiplos IDs para origem
+            if (idsOrigem.size() > 1) {
+                cout << "\n⚠️  Múltiplos pesquisadores encontrados com o nome '" << nomeOrigem << "':\n";
+                for (size_t i = 0; i < idsOrigem.size(); i++) {
+                    cout << "   " << (i+1) << ". ID " << idsOrigem[i] << ": "
+                         << mappingPesquisadores->obterNomePorId(idsOrigem[i]) << "\n";
+                }
+                cout << "\n👉 Selecione o número correspondente: ";
+                int selecao;
+                cin >> selecao;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                if (selecao < 1 || selecao > static_cast<int>(idsOrigem.size())) {
+                    cout << "\n❌ Seleção inválida.\n";
+                    return;
+                }
+                idOrigem = idsOrigem[selecao - 1];
+            } else {
+                idOrigem = idsOrigem.front();
+            }
+
+            // Tratar múltiplos IDs para destino
+            if (idsDestino.size() > 1) {
+                cout << "\n⚠️  Múltiplos pesquisadores encontrados com o nome '" << nomeDestino << "':\n";
+                for (size_t i = 0; i < idsDestino.size(); i++) {
+                    cout << "   " << (i+1) << ". ID " << idsDestino[i] << ": "
+                         << mappingPesquisadores->obterNomePorId(idsDestino[i]) << "\n";
+                }
+                cout << "\n👉 Selecione o número correspondente: ";
+                int selecao;
+                cin >> selecao;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                if (selecao < 1 || selecao > static_cast<int>(idsDestino.size())) {
+                    cout << "\n❌ Seleção inválida.\n";
+                    return;
+                }
+                idDestino = idsDestino[selecao - 1];
+            } else {
+                idDestino = idsDestino.front();
+            }
+
+            // Confirmar os pesquisadores selecionados
+            cout << "\n📋 Calculando distância entre:\n";
+            cout << "   🔹 Origem: " << mappingPesquisadores->obterNomePorId(idOrigem)
+                 << " (ID: " << idOrigem << ")\n";
+            cout << "   🔹 Destino: " << mappingPesquisadores->obterNomePorId(idDestino)
+                 << " (ID: " << idDestino << ")\n\n";
+
+            // Executar Dijkstra
+            cout << "🔍 Executando algoritmo de Dijkstra (" << tipoDijkstra << ")...\n";
+
+            ResultadoDijkstra resultado;
+            if (tipoDijkstra == "vetor") {
+                resultado = Dijkstra::dijkstraVetor(*listaPeso, idOrigem);
+            } else {
+                resultado = Dijkstra::dijkstraHeap(*listaPeso, idOrigem);
+            }
+
+            // Verificar se há caminho
+            int destinoIdx = idDestino - 1;
+            if (resultado.distancias[destinoIdx] == numeric_limits<double>::infinity()) {
+                cout << "\n❌ Não há caminho entre os pesquisadores selecionados!\n";
+                cout << "   Os pesquisadores estão em componentes desconexas do grafo.\n";
+                return;
+            }
+
+            // Mostrar resultado
+            cout << "\n✅ RESULTADO:\n";
+            cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+            cout << "📏 Distância total: " << fixed << setprecision(2)
+                 << resultado.distancias[destinoIdx] << "\n\n";
+
+            // Reconstruir caminho
+            vector<int> caminho;
+            int atual = idDestino;
+            while (atual != idOrigem && atual != -1) {
+                caminho.push_back(atual);
+                atual = resultado.predecessores[atual-1];
+            }
+
+            if (atual == idOrigem) {
+                caminho.push_back(idOrigem);
+                reverse(caminho.begin(), caminho.end());
+
+                cout << "🛤️  Caminho (total de " << caminho.size() << " pesquisadores):\n\n";
+                for (size_t i = 0; i < caminho.size(); i++) {
+                    int id = caminho[i];
+                    const string& nome = mappingPesquisadores->obterNomePorId(id);
+                    cout << "   " << setw(2) << (i+1) << ". " << nome << " (ID: " << id << ")";
+
+                    if (i < caminho.size() - 1) {
+                        // Calcular peso da aresta
+                        int proximoId = caminho[i+1];
+                        double pesoAresta = resultado.distancias[proximoId-1] - resultado.distancias[id-1];
+                        cout << "\n       ↓ (peso: " << fixed << setprecision(2) << pesoAresta << ")\n";
+                    }
+                    cout << "\n";
+                }
+
+            } else {
+                cout << "\n❌ Erro na reconstrução do caminho!\n";
+            }
+
+        } catch (const out_of_range& e) {
+            cout << "\n❌ Erro: " << e.what() << "\n";
+            cout << "   Verifique se os nomes estão escritos corretamente.\n";
+        } catch (const exception& e) {
+            cout << "\n❌ Erro durante o cálculo: " << e.what() << "\n";
         }
     }
     
@@ -906,7 +1187,8 @@ public:
             cout << "   4. Executar algoritmos de busca\n";
             cout << "   5. Analisar estatísticas do grafo\n";
             cout << "   6. Calcular distâncias (grafos sem peso)\n";
-            cout << "   7. Benchmark Dijkstra (grafos com peso)\n\n";
+            cout << "   7. Benchmark Dijkstra (grafos com peso)\n";
+            cout << "   8. Consultar pesquisadores (nome/ID)\n\n";
             
             cout << "   0. Sair\n\n";
             cout << "👉 Digite sua opção: ";
@@ -934,6 +1216,9 @@ public:
                     break;
                 case 7:
                     benchmarkDijkstra();
+                    break;
+                case 8:
+                    consultarPesquisadores();
                     break;
                 case 0:
                     limparTela();
