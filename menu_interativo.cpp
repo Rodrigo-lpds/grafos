@@ -710,7 +710,7 @@ private:
             cout << "\n📊 RESULTADOS DO DIJKSTRA:\n";
             cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
             cout << "Origem: " << origem << "\n\n";
-            
+            /*
             cout << "Distâncias mínimas:\n";
             for (int i = 1; i <= numVertices; i++) {
                 cout << "  Vértice " << setw(3) << i << ": ";
@@ -720,7 +720,7 @@ private:
                     cout << fixed << setprecision(2) << resultado.distancias[i-1] << "\n";
                 }
             }
-            
+            */
             cout << "\n👉 Deseja ver o caminho para algum vértice específico? (s/n): ";
             char resposta;
             cin >> resposta;
@@ -1221,7 +1221,7 @@ public:
                     consultarPesquisadores();
                     break;
                 case 0:
-                    limparTela();
+                    //limparTela();
                     cout << "👋 Obrigado por usar o Sistema de Análise de Grafos!\n";
                     cout << "🚀 Desenvolvido com ❤️  para análise eficiente de grafos.\n\n";
                     break;

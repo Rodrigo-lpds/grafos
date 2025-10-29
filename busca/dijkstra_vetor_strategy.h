@@ -4,12 +4,15 @@
 #include "dijkstra_strategy.h"
 #include <limits>
 
+using namespace std;
+
 class DijkstraVetorStrategy : public IDijkstraStrategy {
 private:
     vector<double> distancias;
     vector<bool> visitado;
     int n;
     int proximoMinimo; // Cache do próximo vértice com menor distância
+    int verticesVisitados; // Contador para otimizar vazio()
 
     void atualizarProximoMinimo() {
         proximoMinimo = -1;
@@ -29,6 +32,7 @@ public:
         distancias.assign(n, numeric_limits<double>::infinity());
         visitado.assign(n, false);
         proximoMinimo = -1;
+        verticesVisitados = 0; // Inicializar contador
     }
 
     void inserirOuAtualizar(int vertice, double distancia) override {
@@ -46,36 +50,30 @@ public:
         if (proximoMinimo == -1 || visitado[proximoMinimo]) {
             atualizarProximoMinimo();
         }
-        
+
         if (proximoMinimo != -1) {
             visitado[proximoMinimo] = true;
+            verticesVisitados++; // Incrementar contador
             int resultado = proximoMinimo;
             proximoMinimo = -1; // Invalidar cache para forçar recálculo na próxima chamada
             return resultado;
         }
-        
+
         return -1;
     }
 
     bool vazio() const override {
-        // Versão otimizada: se há um próximo mínimo válido, não está vazio
-        if (proximoMinimo != -1 && !visitado[proximoMinimo]) {
-            return false;
-        }
-        
-        // Caso contrário, verificar todos os vértices
-        for (int v = 0; v < n; v++) {
-            if (!visitado[v] && distancias[v] != numeric_limits<double>::infinity()) {
-                return false;
-            }
-        }
-        return true;
+        // Otimização: verifica se todos os vértices foram visitados em O(1)
+        return verticesVisitados >= n;
     }
 
     void marcarVisitado(int vertice) override {
-        visitado[vertice] = true;
-        if (proximoMinimo == vertice) {
-            proximoMinimo = -1; // Invalidar cache
+        if (!visitado[vertice]) {
+            visitado[vertice] = true;
+            verticesVisitados++; // Incrementar contador
+            if (proximoMinimo == vertice) {
+                proximoMinimo = -1; // Invalidar cache
+            }
         }
     }
 };

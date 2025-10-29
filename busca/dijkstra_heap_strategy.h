@@ -6,6 +6,8 @@
 #include <limits>
 #include <vector>
 
+using namespace std;
+
 class DijkstraHeapStrategy : public IDijkstraStrategy {
 private:
     priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>> pq;
@@ -19,13 +21,13 @@ public:
         distancias.assign(n, numeric_limits<double>::infinity());
         visitados.assign(n, false);
 
-        while (!pq.empty()) {
-            pq.pop();
-        }
+        pq = priority_queue<pair<double, int>, vector<pair<double, int>>, greater<pair<double, int>>>();
     }
 
     void inserirOuAtualizar(int vertice, double distancia) override {
-        if (!visitados[vertice]) {
+        // Otimização: removida verificação de visitados para permitir atualizações de distância
+        // A heap permite duplicatas, que serão filtradas em extrairMinimo()
+        if (distancia < distancias[vertice]) {
             distancias[vertice] = distancia;
             pq.push({distancia, vertice});
         }
