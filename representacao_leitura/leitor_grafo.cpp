@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <tuple>
 
-DadosGrafo LeitorGrafo::lerArquivo(const string& nomeArquivo) {
+DadosGrafo LeitorGrafo::lerArquivo(const string& nomeArquivo, bool direcionado) {
     ifstream arquivo(nomeArquivo);
     if (!arquivo) {
         throw runtime_error("Erro ao abrir arquivo de entrada");
@@ -15,6 +15,7 @@ DadosGrafo LeitorGrafo::lerArquivo(const string& nomeArquivo) {
 
     if (getline(arquivo, linha)) {
         dados.numVertices = stoi(linha);
+        dados.direcionado = direcionado;
     }
 
     while (getline(arquivo, linha)) {
@@ -30,7 +31,7 @@ DadosGrafo LeitorGrafo::lerArquivo(const string& nomeArquivo) {
     return dados;
 }
 
-DadosGrafoPeso LeitorGrafo::lerArquivoComPeso(const string& nomeArquivo) {
+DadosGrafoPeso LeitorGrafo::lerArquivoComPeso(const string& nomeArquivo, bool direcionado) {
     ifstream arquivo(nomeArquivo);
     if (!arquivo) {
         throw runtime_error("Erro ao abrir arquivo de entrada");
@@ -41,6 +42,7 @@ DadosGrafoPeso LeitorGrafo::lerArquivoComPeso(const string& nomeArquivo) {
 
     if (getline(arquivo, linha)) {
         dados.numVertices = stoi(linha);
+        dados.direcionado = direcionado;
     }
 
     while (getline(arquivo, linha)) {

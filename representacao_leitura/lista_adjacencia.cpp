@@ -6,13 +6,20 @@
 
 ListaAdjacencia::ListaAdjacencia(const DadosGrafo& dados) {
     n = dados.numVertices;
+    direcionado = dados.direcionado;
     lista.resize(n);
 
     for (const auto& aresta : dados.arestas) {
         int u = aresta.first - 1;
         int v = aresta.second - 1;
+        
+        // Adiciona aresta u -> v
         lista[u].push_back(v + 1);
-        lista[v].push_back(u + 1);
+        
+        // Se não é direcionado, adiciona também v -> u
+        if (!direcionado) {
+            lista[v].push_back(u + 1);
+        }
     }
 }
 
@@ -32,7 +39,8 @@ void ListaAdjacencia::salvarEmArquivo(const string& nomeSaida) const {
 
     auto listaOrdenada = getListaOrdenada();
 
-    saida << "Lista de Adjacencia (" << n << " vertices):\n";
+    saida << "Lista de Adjacencia (" << n << " vertices, ";
+    saida << (direcionado ? "direcionado" : "nao direcionado") << "):\n";
     for (int i = 0; i < n; i++) {
         saida << "Vertice " << (i + 1) << ": ";
         if (listaOrdenada[i].empty()) {
@@ -53,7 +61,8 @@ void ListaAdjacencia::imprimir() const {
 
     auto listaOrdenada = getListaOrdenada();
 
-    cout << "Lista de Adjacencia (" << n << " vertices):\n";
+    cout << "Lista de Adjacencia (" << n << " vertices, ";
+    cout << (direcionado ? "direcionado" : "nao direcionado") << "):\n";
     for (int i = 0; i < n; i++) {
         cout << "Vertice " << (i + 1) << ": ";
         if (listaOrdenada[i].empty()) {
@@ -76,4 +85,8 @@ const vector<vector<int>>& ListaAdjacencia::getLista() const {
 
 int ListaAdjacencia::getNumVertices() const {
     return n;
+}
+
+bool ListaAdjacencia::isDirecionado() const {
+    return direcionado;
 }
