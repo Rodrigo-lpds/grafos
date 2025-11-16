@@ -21,8 +21,14 @@ public:
     // Método principal usando a interface IGrafoPeso
     static ResultadoBellmanFord executar(const IGrafoPeso& grafo, int origem);
     
+    // Versão otimizada com melhorias práticas
+    static ResultadoBellmanFord executarOtimizado(const IGrafoPeso& grafo, int origem);
+    
     // Método de conveniência para ListaAdjacenciaPeso
     static ResultadoBellmanFord bellmanFord(const ListaAdjacenciaPeso& grafo, int origem);
+    
+    // Versão otimizada de conveniência
+    static ResultadoBellmanFord bellmanFordOtimizado(const ListaAdjacenciaPeso& grafo, int origem);
     
     // Utilitários
     static void imprimirResultado(const ResultadoBellmanFord& resultado);

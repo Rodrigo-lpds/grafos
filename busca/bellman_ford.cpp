@@ -83,6 +83,104 @@ ResultadoBellmanFord BellmanFord::bellmanFord(const ListaAdjacenciaPeso& grafo, 
     return executar(adapter, origem);
 }
 
+ResultadoBellmanFord BellmanFord::executarOtimizado(const IGrafoPeso& grafo, int origem) {
+    int n = grafo.getNumVertices();
+    int t = origem - 1; // Converter para indexação 0-based
+    
+    // MELHORIA 1: Usar apenas um vetor M[v] ao invés de matriz M[i,v]
+    // Custo de memória: O(n) ao invés de O(n²)
+    vector<double> M(n, INFINITO);
+    vector<int> predecessores(n, -1);
+    
+    // M[t] = 0 (origem)
+    M[t] = 0;
+    
+    // MELHORIA 2: Terminar quando nenhuma distância for atualizada
+    // Reduz tempo de execução na prática
+    bool houveMudanca = true;
+    int iteracao = 0;
+    
+    // For i = 1, ..., n-1 (mas pode terminar antes)
+    while (houveMudanca && iteracao < n - 1) {
+        houveMudanca = false;
+        iteracao++;
+        
+        cout << "  [Otimizado] Iteração " << iteracao << "... ";
+        int atualizacoes = 0;
+        
+        // Para cada vértice v
+        for (int v = 0; v < n; v++) {
+            double melhorDistancia = M[v];
+            int melhorPredecessor = predecessores[v];
+            
+            // Para cada vértice w que pode levar a v
+            for (int w = 0; w < n; w++) {
+                auto [existeAresta, peso] = grafo.getAresta(w, v);
+                if (existeAresta && M[w] != INFINITO) {
+                    double novaDistancia = M[w] + peso;
+                    // M[v] = min(M[v], M[w] + c_wv)
+                    if (novaDistancia < melhorDistancia) {
+                        melhorDistancia = novaDistancia;
+                        melhorPredecessor = w + 1; // Converter para 1-based
+                    }
+                }
+            }
+            
+            // Atualizar apenas se houve melhoria
+            if (melhorDistancia < M[v]) {
+                M[v] = melhorDistancia;
+                predecessores[v] = melhorPredecessor;
+                houveMudanca = true;
+                atualizacoes++;
+            }
+        }
+        
+        cout << atualizacoes << " atualizações\n";
+        
+        // Se não houve mudanças, algoritmo pode terminar
+        if (!houveMudanca) {
+            cout << "  [Otimizado] Convergência antecipada na iteração " << iteracao << "!\n";
+            break;
+        }
+    }
+    
+    // Preparar resultado
+    ResultadoBellmanFord resultado;
+    resultado.origem = origem;
+    resultado.distancias = M;
+    resultado.predecessores = predecessores;
+    
+    // Verificar ciclo negativo (executar mais uma iteração)
+    vector<double> verificacao = M;
+    bool mudou = false;
+    
+    for (int v = 0; v < n; v++) {
+        for (int w = 0; w < n; w++) {
+            auto [existeAresta, peso] = grafo.getAresta(w, v);
+            if (existeAresta && M[w] != INFINITO) {
+                double novaDistancia = M[w] + peso;
+                if (novaDistancia < verificacao[v]) {
+                    verificacao[v] = novaDistancia;
+                    mudou = true;
+                }
+            }
+        }
+    }
+    
+    resultado.temCicloNegativo = mudou;
+    
+    if (resultado.temCicloNegativo) {
+        resultado.cicloNegativo = detectarCicloNegativo(grafo, resultado.distancias, resultado.predecessores);
+    }
+    
+    return resultado;
+}
+
+ResultadoBellmanFord BellmanFord::bellmanFordOtimizado(const ListaAdjacenciaPeso& grafo, int origem) {
+    ListaAdjacenciaPesoAdapter adapter(grafo);
+    return executarOtimizado(adapter, origem);
+}
+
 vector<int> BellmanFord::detectarCicloNegativo(const IGrafoPeso& grafo,
                                              const vector<double>& distancias,
                                              const vector<int>& predecessores) {
