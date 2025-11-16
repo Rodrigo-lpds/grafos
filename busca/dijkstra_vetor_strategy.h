@@ -11,8 +11,8 @@ private:
     vector<double> distancias;
     vector<bool> visitado;
     int n;
-    int proximoMinimo; // Cache do próximo vértice com menor distância
-    int verticesVisitados; // Contador para otimizar vazio()
+    int proximoMinimo;
+    int verticesVisitados;
 
     void atualizarProximoMinimo() {
         proximoMinimo = -1;
@@ -38,7 +38,6 @@ public:
     void inserirOuAtualizar(int vertice, double distancia) override {
         distancias[vertice] = distancia;
         
-        // Se este vértice tem distância menor que o atual mínimo, atualize
         if (proximoMinimo == -1 || 
             (!visitado[vertice] && distancia < distancias[proximoMinimo])) {
             proximoMinimo = vertice;
@@ -46,16 +45,15 @@ public:
     }
 
     int extrairMinimo() override {
-        // Se o cache está inválido ou o vértice já foi visitado, recalcular
         if (proximoMinimo == -1 || visitado[proximoMinimo]) {
             atualizarProximoMinimo();
         }
 
         if (proximoMinimo != -1) {
             visitado[proximoMinimo] = true;
-            verticesVisitados++; // Incrementar contador
+            verticesVisitados++;
             int resultado = proximoMinimo;
-            proximoMinimo = -1; // Invalidar cache para forçar recálculo na próxima chamada
+            proximoMinimo = -1;
             return resultado;
         }
 
@@ -63,16 +61,15 @@ public:
     }
 
     bool vazio() const override {
-        // Otimização: verifica se todos os vértices foram visitados em O(1)
         return verticesVisitados >= n;
     }
 
     void marcarVisitado(int vertice) override {
         if (!visitado[vertice]) {
             visitado[vertice] = true;
-            verticesVisitados++; // Incrementar contador
+            verticesVisitados++; 
             if (proximoMinimo == vertice) {
-                proximoMinimo = -1; // Invalidar cache
+                proximoMinimo = -1;
             }
         }
     }
