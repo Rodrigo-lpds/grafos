@@ -77,12 +77,7 @@ ResultadoBellmanFord BellmanFord::executar(const IGrafoPeso& grafo, int origem) 
     return resultado;
 }
 
-ResultadoBellmanFord BellmanFord::bellmanFord(const ListaAdjacenciaPeso& grafo, int origem) {
-    ListaAdjacenciaPesoAdapter adapter(grafo);
-    return executar(adapter, origem);
-}
-
-ResultadoBellmanFord BellmanFord::bellmanFordOtimizado(const ListaAdjacenciaPeso& grafo, int origem) {
+ResultadoBellmanFord BellmanFord::executar(const ListaAdjacenciaPeso& grafo, int origem) {
     ListaAdjacenciaPesoAdapter adapter(grafo);
     return executar(adapter, origem);
 }

@@ -18,22 +18,19 @@ struct ResultadoBellmanFord {
 
 class BellmanFord {
 public:
-    // Método principal usando a interface IGrafoPeso (versão otimizada)
+    // Método principal usando a interface IGrafoPeso
     static ResultadoBellmanFord executar(const IGrafoPeso& grafo, int origem);
-    
+
     // Método de conveniência para ListaAdjacenciaPeso
-    static ResultadoBellmanFord bellmanFord(const ListaAdjacenciaPeso& grafo, int origem);
-    
-    // Versão otimizada de conveniência (aponta para o método principal)
-    static ResultadoBellmanFord bellmanFordOtimizado(const ListaAdjacenciaPeso& grafo, int origem);
-    
+    static ResultadoBellmanFord executar(const ListaAdjacenciaPeso& grafo, int origem);
+
     // Utilitários
     static void imprimirResultado(const ResultadoBellmanFord& resultado);
     static vector<int> obterCaminho(const ResultadoBellmanFord& resultado, int destino);
-    
+
 private:
     // Detecta ciclo negativo e reconstrói o caminho
-    static vector<int> detectarCicloNegativo(const IGrafoPeso& grafo, 
+    static vector<int> detectarCicloNegativo(const IGrafoPeso& grafo,
                                            const vector<double>& distancias,
                                            const vector<int>& predecessores);
 };
