@@ -9,84 +9,6 @@ ResultadoBellmanFord BellmanFord::executar(const IGrafoPeso& grafo, int origem) 
     int n = grafo.getNumVertices();
     int t = origem - 1; // Converter para indexação 0-based
     
-    // Array M[0,...,n-1 ; 1,...,n] - usando vector de vectors
-    vector<vector<double>> M(n, vector<double>(n, INFINITO));
-    vector<vector<int>> predecessores(n, vector<int>(n, -1));
-    
-    // M[0, v] = ∞ para todo v (já inicializado)
-    // M[0, t] = 0
-    M[0][t] = 0;
-    
-    // For i = 1, ..., n-1
-    for (int i = 1; i < n; i++) {
-        // For v = 0, ..., n-1 (convertido para 0-based)
-        for (int v = 0; v < n; v++) {
-            // M[i, v] = M[i-1, v]
-            M[i][v] = M[i-1][v];
-            predecessores[i][v] = predecessores[i-1][v];
-            
-            // Para cada vizinho w de v (arestas ENTRANTES em v)
-            // Precisamos iterar sobre todos os vértices para encontrar quem aponta para v
-            for (int w = 0; w < n; w++) {
-                auto [existeAresta, peso] = grafo.getAresta(w, v);
-                if (existeAresta && M[i-1][w] != INFINITO) {
-                    double novaDistancia = M[i-1][w] + peso;
-                    // M[i, v] = min(M[i, v], M[i-1, w] + c_wv)
-                    if (novaDistancia < M[i][v]) {
-                        M[i][v] = novaDistancia;
-                        predecessores[i][v] = w + 1; // Converter para 1-based
-                    }
-                }
-            }
-        }
-    }
-    
-    // Preparar resultado
-    ResultadoBellmanFord resultado;
-    resultado.origem = origem;
-    resultado.distancias = M[n-1]; // Retorna M[n-1, *]
-    resultado.predecessores.resize(n);
-    
-    // Copiar predecessores da última iteração
-    for (int v = 0; v < n; v++) {
-        resultado.predecessores[v] = predecessores[n-1][v];
-    }
-    
-    // Verificar ciclo negativo (executar mais uma iteração)
-    vector<double> verificacao = M[n-1];
-    bool mudou = false;
-    
-    for (int v = 0; v < n; v++) {
-        for (int w = 0; w < n; w++) {
-            auto [existeAresta, peso] = grafo.getAresta(w, v);
-            if (existeAresta && M[n-1][w] != INFINITO) {
-                double novaDistancia = M[n-1][w] + peso;
-                if (novaDistancia < verificacao[v]) {
-                    verificacao[v] = novaDistancia;
-                    mudou = true;
-                }
-            }
-        }
-    }
-    
-    resultado.temCicloNegativo = mudou;
-    
-    if (resultado.temCicloNegativo) {
-        resultado.cicloNegativo = detectarCicloNegativo(grafo, resultado.distancias, resultado.predecessores);
-    }
-    
-    return resultado;
-}
-
-ResultadoBellmanFord BellmanFord::bellmanFord(const ListaAdjacenciaPeso& grafo, int origem) {
-    ListaAdjacenciaPesoAdapter adapter(grafo);
-    return executar(adapter, origem);
-}
-
-ResultadoBellmanFord BellmanFord::executarOtimizado(const IGrafoPeso& grafo, int origem) {
-    int n = grafo.getNumVertices();
-    int t = origem - 1; // Converter para indexação 0-based
-    
     // MELHORIA 1: Usar apenas um vetor M[v] ao invés de matriz M[i,v]
     // Custo de memória: O(n) ao invés de O(n²)
     vector<double> M(n, INFINITO);
@@ -176,9 +98,14 @@ ResultadoBellmanFord BellmanFord::executarOtimizado(const IGrafoPeso& grafo, int
     return resultado;
 }
 
+ResultadoBellmanFord BellmanFord::bellmanFord(const ListaAdjacenciaPeso& grafo, int origem) {
+    ListaAdjacenciaPesoAdapter adapter(grafo);
+    return executar(adapter, origem);
+}
+
 ResultadoBellmanFord BellmanFord::bellmanFordOtimizado(const ListaAdjacenciaPeso& grafo, int origem) {
     ListaAdjacenciaPesoAdapter adapter(grafo);
-    return executarOtimizado(adapter, origem);
+    return executar(adapter, origem);
 }
 
 vector<int> BellmanFord::detectarCicloNegativo(const IGrafoPeso& grafo,
