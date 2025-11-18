@@ -54,6 +54,7 @@ ResultadoDijkstra Dijkstra::dijkstraHeap(const ListaAdjacenciaPeso& grafo, int o
     return executar(adapter, origem, move(strategy));
 }
 
+
 void Dijkstra::imprimirResultado(const ResultadoDijkstra& resultado) {
     cout << "Distancias minimas a partir do vertice " << resultado.origem << ":\n";
     cout << fixed << setprecision(1);

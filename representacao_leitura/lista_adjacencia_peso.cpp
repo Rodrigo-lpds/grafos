@@ -7,6 +7,7 @@
 
 ListaAdjacenciaPeso::ListaAdjacenciaPeso(const DadosGrafoPeso& dados) {
     n = dados.numVertices;
+    direcionado = dados.direcionado;
     lista.resize(n);
 
     for (const auto& aresta : dados.arestas) {
@@ -14,8 +15,13 @@ ListaAdjacenciaPeso::ListaAdjacenciaPeso(const DadosGrafoPeso& dados) {
         int v = get<1>(aresta) - 1;
         double peso = get<2>(aresta);
 
+        // Adiciona aresta u -> v
         lista[u].push_back({v + 1, peso});
-        lista[v].push_back({u + 1, peso});
+        
+        // Se não é direcionado, adiciona também v -> u
+        if (!direcionado) {
+            lista[v].push_back({u + 1, peso});
+        }
     }
 }
 
@@ -35,7 +41,8 @@ void ListaAdjacenciaPeso::salvarEmArquivo(const string& nomeSaida) const {
 
     auto listaOrdenada = getListaOrdenada();
 
-    saida << "Lista de Adjacencia com Peso (" << n << " vertices):\n";
+    saida << "Lista de Adjacencia com Peso (" << n << " vertices, ";
+    saida << (direcionado ? "direcionado" : "nao direcionado") << "):\n";
     saida << fixed << setprecision(1);
 
     for (int i = 0; i < n; i++) {
@@ -58,7 +65,8 @@ void ListaAdjacenciaPeso::imprimir() const {
 
     auto listaOrdenada = getListaOrdenada();
 
-    cout << "Lista de Adjacencia com Peso (" << n << " vertices):\n";
+    cout << "Lista de Adjacencia com Peso (" << n << " vertices, ";
+    cout << (direcionado ? "direcionado" : "nao direcionado") << "):\n";
     cout << fixed << setprecision(1);
 
     for (int i = 0; i < n; i++) {
@@ -83,4 +91,8 @@ const vector<vector<pair<int, double>>>& ListaAdjacenciaPeso::getLista() const {
 
 int ListaAdjacenciaPeso::getNumVertices() const {
     return n;
+}
+
+bool ListaAdjacenciaPeso::isDirecionado() const {
+    return direcionado;
 }

@@ -10,6 +10,7 @@ using namespace std;
 class ListaAdjacenciaPeso {
 private:
     int n;
+    bool direcionado;
     vector<vector<pair<int, double>>> lista;
 
     vector<vector<pair<int, double>>> getListaOrdenada() const;
@@ -25,6 +26,8 @@ public:
     const vector<vector<pair<int, double>>>& getLista() const;
 
     int getNumVertices() const;
+    
+    bool isDirecionado() const;
 };
 
 #endif

@@ -25,8 +25,6 @@ public:
     }
 
     void inserirOuAtualizar(int vertice, double distancia) override {
-        // Otimização: removida verificação de visitados para permitir atualizações de distância
-        // A heap permite duplicatas, que serão filtradas em extrairMinimo()
         if (distancia < distancias[vertice]) {
             distancias[vertice] = distancia;
             pq.push({distancia, vertice});
