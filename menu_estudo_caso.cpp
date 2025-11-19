@@ -361,19 +361,20 @@ public:
         cout << "\nGerando grafo com arestas invertidas para Dijkstra..." << endl;
         auto grafoInvertido = gerarGrafoInvertido();
 
-        ListaAdjacenciaPesoAdapter adapterOriginal(*listaPeso);
         ListaAdjacenciaPesoAdapter adapterInvertido(*grafoInvertido);
 
         // 1. Calcular distâncias com ambos algoritmos
         cout << "\n1. Calculando distancias..." << endl;
 
-        // Bellman-Ford no grafo original a partir do vértice 100
-        ResultadoBellmanFord resultadoBF = BellmanFord::executar(adapterOriginal, verticeDestino - 1);
+        // Bellman-Ford no grafo invertido a partir do vértice 100
+        // Para calcular dist(v -> 100), invertemos as arestas e calculamos dist(100 -> v)
+        ResultadoBellmanFord resultadoBF = BellmanFord::executar(adapterInvertido, verticeDestino - 1);
 
         // Dijkstra no grafo invertido a partir do vértice 100
+        // Dijkstra espera índice 1-based (faz origem - 1 internamente)
         ResultadoDijkstra resultadoDij = Dijkstra::executar(
             adapterInvertido,
-            verticeDestino - 1,
+            verticeDestino,
             make_unique<DijkstraHeapStrategy>()
         );
 
@@ -388,7 +389,7 @@ public:
         cout << "\nBellman-Ford:" << endl;
         for (int i = 0; i < numRodadas; i++) {
             auto inicio = chrono::high_resolution_clock::now();
-            BellmanFord::executar(adapterOriginal, verticeDestino - 1);
+            BellmanFord::executar(adapterInvertido, verticeDestino - 1);
             auto fim = chrono::high_resolution_clock::now();
 
             chrono::duration<double> duracao = fim - inicio;
@@ -402,7 +403,7 @@ public:
             auto inicio = chrono::high_resolution_clock::now();
             Dijkstra::executar(
                 adapterInvertido,
-                verticeDestino - 1,
+                verticeDestino,
                 make_unique<DijkstraHeapStrategy>()
             );
             auto fim = chrono::high_resolution_clock::now();
